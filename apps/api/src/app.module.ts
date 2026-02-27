@@ -7,6 +7,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PacksModule } from './modules/packs/packs.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { PacksModule } from './modules/packs/packs.module';
     AuditModule,
     AuthModule,
     PacksModule,
+    OrdersModule,
   ],
 
   providers: [
