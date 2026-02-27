@@ -6,14 +6,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { UsersModule } from './modules/users/users.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
-
-// ─── Entités Sprint 2 ─────────────────────────────────────
-import { Category } from './modules/packs/entities/category.entity';
-import { Product } from './modules/packs/entities/product.entity';
-import { Pack } from './modules/packs/entities/pack.entity';
-import { PackProduct } from './modules/packs/entities/pack-product.entity';
-import { Order } from './modules/orders/entities/order.entity';
-import { OrderItem } from './modules/orders/entities/order-item.entity';
+import { PacksModule } from './modules/packs/packs.module';
 
 @Module({
   imports: [
@@ -48,6 +41,7 @@ import { OrderItem } from './modules/orders/entities/order-item.entity';
     UsersModule,
     AuditModule,
     AuthModule,
+    PacksModule,
   ],
 
   providers: [
