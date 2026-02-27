@@ -5,16 +5,15 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { UsersModule } from './modules/users/users.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
-    // ─── Config globale (.env.local) ──────────────────────
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env.local',
     }),
 
-    // ─── PostgreSQL via TypeORM ────────────────────────────
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -31,7 +30,6 @@ import { AuditModule } from './modules/audit/audit.module';
       }),
     }),
 
-    // ─── Rate Limiting ─────────────────────────────────────
     ThrottlerModule.forRoot({
       throttlers: [
         { name: 'default', ttl: 60000, limit: 60 },
@@ -39,9 +37,9 @@ import { AuditModule } from './modules/audit/audit.module';
       ],
     }),
 
-    // ─── Modules métier ────────────────────────────────────
     UsersModule,
     AuditModule,
+    AuthModule,
   ],
 
   providers: [
