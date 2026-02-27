@@ -4,7 +4,6 @@ import request from 'supertest';
 import cookieParser from 'cookie-parser';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from '../src/modules/auth/auth.module';
@@ -109,14 +108,12 @@ describe('Auth (E2E)', () => {
       const uniqueEmail = `duplicate_${Date.now()}@barbershop.sn`;
 
       // Premier register
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send({
-          email: uniqueEmail,
-          password: 'Test@2025!',
-          firstName: 'Moussa',
-          lastName: 'Diallo',
-        });
+      await request(app.getHttpServer()).post('/api/v1/auth/register').send({
+        email: uniqueEmail,
+        password: 'Test@2025!',
+        firstName: 'Moussa',
+        lastName: 'Diallo',
+      });
 
       // Deuxième register avec le même email
       const res = await request(app.getHttpServer())
@@ -152,14 +149,12 @@ describe('Auth (E2E)', () => {
 
     beforeAll(async () => {
       // Créer l'utilisateur de test
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send({
-          email: testEmail,
-          password: 'Test@2025!',
-          firstName: 'Login',
-          lastName: 'Test',
-        });
+      await request(app.getHttpServer()).post('/api/v1/auth/register').send({
+        email: testEmail,
+        password: 'Test@2025!',
+        firstName: 'Login',
+        lastName: 'Test',
+      });
     });
 
     it('✅ 200 — login réussi + cookie refresh_token présent', async () => {
@@ -173,15 +168,15 @@ describe('Auth (E2E)', () => {
       expect(res.body.user.email).toBe(testEmail);
 
       // Vérifier que le cookie httpOnly est bien présent
-        const rawCookies = res.headers['set-cookie'];
-        const cookies: string[] = Array.isArray(rawCookies)
+      const rawCookies = res.headers['set-cookie'];
+      const cookies: string[] = Array.isArray(rawCookies)
         ? rawCookies
-        : [rawCookies as string];
-        const refreshCookie = cookies.find((c: string) =>
+        : [rawCookies];
+      const refreshCookie = cookies.find((c: string) =>
         c.startsWith('refresh_token='),
-        );
-        expect(refreshCookie).toBeDefined();
-        expect(refreshCookie).toContain('HttpOnly');
+      );
+      expect(refreshCookie).toBeDefined();
+      expect(refreshCookie).toContain('HttpOnly');
 
       // Sauvegarder pour les tests suivants
       accessToken = res.body.accessToken;
@@ -239,50 +234,48 @@ describe('Auth (E2E)', () => {
 
   describe('POST /api/v1/auth/refresh', () => {
     it('✅ 200 — nouveau accessToken avec cookie valide', async () => {
-      const refreshEmail = `refresh_e2e_${Date.now()}@barbershop.sn`;
+        const refreshEmail = `refresh_e2e_${Date.now()}@barbershop.sn`;
 
-      // Register + Login pour obtenir le cookie
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send({
-          email: refreshEmail,
-          password: 'Test@2025!',
-          firstName: 'Refresh',
-          lastName: 'Test',
-        });
+        await request(app.getHttpServer())
+            .post('/api/v1/auth/register')
+            .send({
+            email: refreshEmail,
+            password: 'Test@2025!',
+            firstName: 'Refresh',
+            lastName: 'Test',
+            });
 
-      const loginRes = await request(app.getHttpServer())
-        .post('/api/v1/auth/login')
-        .send({ email: refreshEmail, password: 'Test@2025!' });
+        const loginRes = await request(app.getHttpServer())
+            .post('/api/v1/auth/login')
+            .send({ email: refreshEmail, password: 'Test@2025!' });
 
-      const cookies = loginRes.headers['set-cookie'];
+         
+        const loginCookieHeader = loginRes.headers['set-cookie'] as string | string[];
+        const loginCookies: string[] = Array.isArray(loginCookieHeader)
+            ? loginCookieHeader
+            : [loginCookieHeader];
 
-      // Utiliser le cookie pour refresh
-        const rawLoginCookies = loginRes.headers['set-cookie'];
-        const loginCookies: string[] = Array.isArray(rawLoginCookies)
-        ? rawLoginCookies
-        : [rawLoginCookies as string];
-
-        // Utiliser le cookie pour refresh
         const res = await request(app.getHttpServer())
-        .post('/api/v1/auth/refresh')
-        .set('Cookie', loginCookies);
+            .post('/api/v1/auth/refresh')
+            .set('Cookie', loginCookies);
 
         expect(res.status).toBe(200);
+         
         expect(res.body).toHaveProperty('accessToken');
-        // On vérifie que le token est bien un JWT valide (format: xxxxx.xxxxx.xxxxx)
-        expect(res.body.accessToken).toMatch(/^[\w-]+\.[\w-]+\.[\w-]+$/);
-        // On vérifie qu'un nouveau cookie refresh_token a bien été émis (rotation)
+         
+        expect((res.body as { accessToken: string }).accessToken).toMatch(
+            /^[\w-]+\.[\w-]+\.[\w-]+$/,
+        );
         const newCookies = res.headers['set-cookie'];
         expect(newCookies).toBeDefined();
-        const newRawCookies = Array.isArray(newCookies)
-        ? newCookies
-        : [newCookies as string];
+        const newRawCookies: string[] = Array.isArray(newCookies)
+            ? newCookies
+            : [newCookies];
         const newRefreshCookie = newRawCookies.find((c: string) =>
-        c.startsWith('refresh_token='),
+            c.startsWith('refresh_token='),
         );
         expect(newRefreshCookie).toBeDefined();
-    });
+        });
 
     it('❌ 401 — sans cookie refresh_token', async () => {
       const res = await request(app.getHttpServer()).post(

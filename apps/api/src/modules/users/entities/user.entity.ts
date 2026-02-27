@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
-  BeforeUpdate,
   Index,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -29,7 +28,6 @@ export class User {
   @Column({ unique: true, length: 20, nullable: true })
   phone: string;
 
-  // select: false → jamais renvoyé dans les requêtes par défaut
   @Column({ name: 'password_hash', nullable: true, select: false })
   passwordHash: string;
 
@@ -43,11 +41,7 @@ export class User {
   avatarUrl: string;
 
   @Index()
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.CLIENT,
-  })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   role: UserRole;
 
   @Column({ name: 'is_active', default: true })
@@ -71,8 +65,6 @@ export class User {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 
-  // ─── Méthodes utilitaires ──────────────────────────────
-
   @BeforeInsert()
   async hashPasswordBeforeInsert() {
     if (this.passwordHash) {
@@ -84,8 +76,15 @@ export class User {
     return bcrypt.compare(plainPassword, this.passwordHash);
   }
 
-  toSafeObject() {
-    const { passwordHash, ...safe } = this as any;
+  toSafeObject(): Omit<
+    User,
+    | 'passwordHash'
+    | 'comparePassword'
+    | 'toSafeObject'
+    | 'hashPasswordBeforeInsert'
+  > {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...safe } = this;
     return safe;
   }
 }

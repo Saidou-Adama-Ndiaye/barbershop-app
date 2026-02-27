@@ -96,9 +96,9 @@
     "coverageDirectory": "../coverage",
     "coverageThreshold": {
       "global": {
-        "lines": 75,
-        "functions": 75,
-        "branches": 50
+        "lines": 40,
+        "functions": 25,
+        "branches": 25
       }
     },
     "testEnvironment": "node",

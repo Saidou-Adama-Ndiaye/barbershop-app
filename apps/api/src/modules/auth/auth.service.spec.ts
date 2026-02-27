@@ -6,10 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
-import {
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { UserRole } from '../users/entities/user.entity';
 
 // ─── Mocks ────────────────────────────────────────────────
@@ -216,7 +213,7 @@ describe('AuthService', () => {
         .mockReturnValueOnce('mock_access_token')
         .mockReturnValueOnce('mock_refresh_token');
 
-      const result = await service.generateTokens(
+      const result = service.generateTokens(
         'uuid-001',
         'test@barbershop.sn',
         UserRole.CLIENT,

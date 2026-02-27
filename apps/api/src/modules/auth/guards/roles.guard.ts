@@ -1,7 +1,17 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { UserRole } from '../../users/entities/user.entity';
+
+interface RequestWithUser extends Request {
+  user: { role: UserRole };
+}
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -12,15 +22,10 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
-
-    // Pas de rôle requis → accès libre (si JWT valide)
     if (!requiredRoles || requiredRoles.length === 0) return true;
 
-    const { user } = context.switchToHttp().getRequest();
-
-    if (!user) {
-      throw new ForbiddenException('Accès refusé');
-    }
+    const { user } = context.switchToHttp().getRequest<RequestWithUser>();
+    if (!user) throw new ForbiddenException('Accès refusé');
 
     const hasRole = requiredRoles.some((role) => user.role === role);
     if (!hasRole) {
@@ -28,7 +33,6 @@ export class RolesGuard implements CanActivate {
         `Accès refusé. Rôle requis : ${requiredRoles.join(' ou ')}`,
       );
     }
-
     return true;
   }
 }

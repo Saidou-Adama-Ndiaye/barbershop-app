@@ -18,15 +18,16 @@ export class RegisterDto {
 
   @ApiProperty({
     example: 'MonMotDePasse@2025',
-    description: 'Minimum 8 caractères, 1 majuscule, 1 chiffre, 1 caractère spécial',
+    description:
+      'Minimum 8 caractères, 1 majuscule, 1 chiffre, 1 caractère spécial',
   })
   @IsString()
   @MinLength(8, { message: 'Le mot de passe doit faire au moins 8 caractères' })
   @MaxLength(50)
-  @Matches(
-    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
-    { message: 'Le mot de passe doit contenir au moins 1 majuscule, 1 chiffre et 1 caractère spécial (!@#$%^&*)' },
-  )
+  @Matches(/^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/, {
+    message:
+      'Le mot de passe doit contenir au moins 1 majuscule, 1 chiffre et 1 caractère spécial (!@#$%^&*)',
+  })
   password: string;
 
   @ApiProperty({ example: 'Moussa', description: 'Prénom' })
@@ -47,9 +48,6 @@ export class RegisterDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(
-    /^\+?[1-9]\d{7,14}$/,
-    { message: 'Numéro de téléphone invalide' },
-  )
+  @Matches(/^\+?[1-9]\d{7,14}$/, { message: 'Numéro de téléphone invalide' })
   phone?: string;
 }

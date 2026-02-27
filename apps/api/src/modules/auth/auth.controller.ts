@@ -8,6 +8,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -59,11 +60,12 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
-    const ipAddress =
-      (req.headers['x-forwarded-for'] as string) ||
-      req.socket.remoteAddress ||
+    const forwardedFor = req.headers['x-forwarded-for'];
+    const ipAddress: string =
+      (typeof forwardedFor === 'string' ? forwardedFor : undefined) ??
+      req.socket.remoteAddress ??
       '';
-    const userAgent = req.headers['user-agent'] || '';
+    const userAgent: string = req.headers['user-agent'] ?? '';
 
     const result = await this.authService.login(dto, {
       ipAddress,
@@ -90,7 +92,9 @@ export class AuthController {
   @UseGuards(RefreshAuthGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Renouveler l\'access token via le refresh token (cookie)' })
+  @ApiOperation({
+    summary: "Renouveler l'access token via le refresh token (cookie)",
+  })
   @ApiCookieAuth('refresh_token')
   @ApiResponse({ status: 200, type: RefreshResponseDto })
   @ApiResponse({ status: 401, description: 'Refresh token invalide ou expiré' })
@@ -98,7 +102,10 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<RefreshResponseDto> {
-    const rawRefreshToken = req.cookies?.['refresh_token'];
+    const rawRefreshToken = req.cookies?.['refresh_token'] as string | undefined;
+    if (!rawRefreshToken) {
+      throw new UnauthorizedException('Refresh token manquant');
+    }
     const result = await this.authService.refresh(rawRefreshToken);
 
     // Rotation : nouveau cookie avec le nouveau refresh token
@@ -138,10 +145,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Obtenir le profil de l\'utilisateur connecté' })
+  @ApiOperation({ summary: "Obtenir le profil de l'utilisateur connecté" })
   @ApiResponse({ status: 200, description: 'Profil utilisateur' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
-  getProfile(@CurrentUser() user: any) {
+  getProfile(
+    @CurrentUser() user: Record<string, unknown>,
+  ): Record<string, unknown> {
     return user;
   }
 }

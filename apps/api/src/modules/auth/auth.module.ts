@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -21,17 +21,25 @@ import { AuditModule } from '../audit/audit.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
+      useFactory: (config: ConfigService): JwtModuleOptions => {
         const secret = config.get<string>('JWT_SECRET');
         if (!secret) throw new Error('JWT_SECRET manquant dans .env.local');
 
+        // StringValue est un type branded de la lib "ms" utilisée par jsonwebtoken
+        // Le cast via unknown est nécessaire car ConfigService retourne string
+        // mais JwtModuleOptions attend StringValue — en runtime c'est identique
+        const expiresIn = config.get<string>(
+          'JWT_EXPIRES_IN',
+          '15m',
+        ) as unknown as JwtModuleOptions['signOptions'] extends {
+          expiresIn?: infer E;
+        }
+          ? E
+          : never;
+
         return {
           secret,
-          // Cast "as any" nécessaire : @nestjs/jwt v11 attend StringValue
-          // (type branded de jsonwebtoken) mais en runtime c'est un string normal
-          signOptions: {
-            expiresIn: config.get<string>('JWT_EXPIRES_IN', '15m') as any,
-          },
+          signOptions: { expiresIn },
         };
       },
     }),

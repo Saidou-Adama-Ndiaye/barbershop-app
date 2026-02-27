@@ -13,30 +13,39 @@ export interface RefreshJwtPayload {
 }
 
 @Injectable()
-export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class RefreshJwtStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(configService: ConfigService) {
     const secret = configService.get<string>('JWT_REFRESH_SECRET');
     if (!secret) throw new Error('JWT_REFRESH_SECRET manquant dans .env.local');
 
-    // On type explicitement l'objet options pour lever l'ambiguïté TypeScript
     const options: StrategyOptionsWithRequest = {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          const token = request?.cookies?.['refresh_token'];
+          const token = request?.cookies?.['refresh_token'] as
+            | string
+            | undefined;
           if (!token) throw new UnauthorizedException('Refresh token manquant');
           return token;
         },
       ]),
       ignoreExpiration: false,
       secretOrKey: secret,
-      passReqToCallback: true, // true → validate(req, payload)
+      passReqToCallback: true,
     };
 
     super(options);
   }
 
-  async validate(request: Request, payload: RefreshJwtPayload) {
-    const refreshToken = request?.cookies?.['refresh_token'];
+  validate(
+    request: Request,
+    payload: RefreshJwtPayload,
+  ): RefreshJwtPayload & { refreshToken: string } {
+    const refreshToken = request?.cookies?.['refresh_token'] as
+      | string
+      | undefined;
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token manquant');
     }

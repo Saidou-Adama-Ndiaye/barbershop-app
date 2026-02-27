@@ -10,7 +10,7 @@ export class AuditService {
     private readonly auditLogRepository: Repository<AuditLog>,
   ) {}
 
-  async log(data: {
+  log(data: {
     userId?: string;
     action: string;
     entityType?: string;
@@ -18,10 +18,9 @@ export class AuditService {
     ipAddress?: string;
     userAgent?: string;
     metadata?: Record<string, any>;
-  }): Promise<void> {
+  }): void {
     const log = this.auditLogRepository.create(data);
-    // fire-and-forget : on ne bloque pas la requête principale
-    this.auditLogRepository.save(log).catch((err) => {
+    void this.auditLogRepository.save(log).catch((err: unknown) => {
       console.error('AuditLog save error:', err);
     });
   }

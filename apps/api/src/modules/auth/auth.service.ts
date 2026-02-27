@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +10,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { RefreshJwtPayload } from './strategies/refresh-jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -36,17 +33,15 @@ export class AuthService {
       phone: dto.phone,
     });
 
-    await this.auditService.log({
+    // fire-and-forget — pas de await
+    this.auditService.log({
       userId: user.id,
       action: 'REGISTER',
       entityType: 'User',
       entityId: user.id,
     });
 
-    return {
-      message: 'Inscription réussie',
-      userId: user.id,
-    };
+    return { message: 'Inscription réussie', userId: user.id };
   }
 
   // ─── Login ───────────────────────────────────────────────
@@ -54,16 +49,15 @@ export class AuthService {
     dto: LoginDto,
     meta: { ipAddress?: string; userAgent?: string },
   ) {
-    // 1. Récupérer le user AVEC son password_hash
     const user = await this.usersService.findByEmailWithPassword(dto.email);
     if (!user) {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    // 2. Vérifier le mot de passe
     const isPasswordValid = await user.comparePassword(dto.password);
     if (!isPasswordValid) {
-      await this.auditService.log({
+      // fire-and-forget — pas de await
+      this.auditService.log({
         userId: user.id,
         action: 'LOGIN_FAILED',
         ipAddress: meta.ipAddress,
@@ -73,16 +67,13 @@ export class AuthService {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    // 3. Vérifier que le compte est actif
     if (!user.isActive) {
       throw new UnauthorizedException('Compte désactivé');
     }
 
-    // 4. Générer les tokens
     const { accessToken, refreshToken, refreshTokenId } =
-      await this.generateTokens(user.id, user.email, user.role);
+      this.generateTokens(user.id, user.email, user.role);
 
-    // 5. Sauvegarder le refresh token hashé en base
     await this.saveRefreshToken({
       userId: user.id,
       tokenId: refreshTokenId,
@@ -91,11 +82,10 @@ export class AuthService {
       userAgent: meta.userAgent,
     });
 
-    // 6. Mettre à jour last_login_at
     await this.usersService.updateLastLogin(user.id);
 
-    // 7. Log d'audit
-    await this.auditService.log({
+    // fire-and-forget — pas de await
+    this.auditService.log({
       userId: user.id,
       action: 'LOGIN',
       entityType: 'User',
@@ -121,20 +111,17 @@ export class AuthService {
 
   // ─── Refresh ─────────────────────────────────────────────
   async refresh(rawRefreshToken: string) {
-    // 1. Décoder le token pour récupérer tokenId et userId
-    let payload: any;
+    let payload: RefreshJwtPayload;
     try {
-      payload = this.jwtService.verify(rawRefreshToken, {
+      payload = this.jwtService.verify<RefreshJwtPayload>(rawRefreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
     } catch {
       throw new UnauthorizedException('Refresh token invalide ou expiré');
     }
 
-    // 2. Hasher le token reçu pour comparer avec la base
     const tokenHash = this.hashToken(rawRefreshToken);
 
-    // 3. Vérifier en base que le token existe et n'est pas révoqué
     const storedToken = await this.refreshTokenRepository.findOne({
       where: {
         id: payload.tokenId,
@@ -152,19 +139,17 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token expiré');
     }
 
-    // 4. Récupérer le user
     const user = await this.usersService.findById(payload.sub);
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Utilisateur introuvable ou désactivé');
     }
 
-    // 5. Rotation : révoquer l'ancien token et en créer un nouveau
     await this.refreshTokenRepository.update(storedToken.id, {
       revoked: true,
     });
 
     const { accessToken, refreshToken, refreshTokenId } =
-      await this.generateTokens(user.id, user.email, user.role);
+      this.generateTokens(user.id, user.email, user.role);
 
     await this.saveRefreshToken({
       userId: user.id,
@@ -184,14 +169,14 @@ export class AuthService {
         { revoked: true },
       );
     } else {
-      // Révoquer TOUS les refresh tokens de l'utilisateur
       await this.refreshTokenRepository.update(
         { userId, revoked: false },
         { revoked: true },
       );
     }
 
-    await this.auditService.log({
+    // fire-and-forget — pas de await
+    this.auditService.log({
       userId,
       action: 'LOGOUT',
       entityType: 'User',
@@ -199,34 +184,33 @@ export class AuthService {
     });
   }
 
-  // ─── Helpers privés ──────────────────────────────────────
-
-  async generateTokens(userId: string, email: string, role: string) {
+  generateTokens(
+    userId: string,
+    email: string,
+    role: string,
+    ): { accessToken: string; refreshToken: string; refreshTokenId: string } {
     const refreshTokenId = crypto.randomUUID();
-
     const payload: JwtPayload = { sub: userId, email, role };
 
-    // "as any" nécessaire : @nestjs/jwt v11 type expiresIn comme StringValue
-    // (type branded) alors qu'en runtime c'est un string ordinaire
-    const accessToken = this.jwtService.sign(payload, {
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment */
+    const accessToken = this.jwtService.sign(payload as any, {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m') as any,
     });
 
     const refreshToken = this.jwtService.sign(
-        { ...payload, tokenId: refreshTokenId },
+        { ...payload, tokenId: refreshTokenId } as any,
         {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<string>(
-            'JWT_REFRESH_EXPIRES_IN',
-            '7d',
-        ) as any,
+        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d') as any,
         },
     );
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment */
 
     return { accessToken, refreshToken, refreshTokenId };
     }
 
+  // ─── Helpers privés ──────────────────────────────────────
   private async saveRefreshToken(data: {
     userId: string;
     tokenId: string;
@@ -235,7 +219,7 @@ export class AuthService {
     userAgent?: string;
   }) {
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // +7 jours
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
     const tokenHash = this.hashToken(data.rawToken);
 
