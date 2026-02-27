@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as bcrypt from 'bcrypt';
 
 // ─── Charger .env.local ───────────────────────────────────
 dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
@@ -53,9 +54,12 @@ async function seed(): Promise<void> {
 
   // ─── Nettoyage dans le bon ordre (FK) ─────────────────
   console.log('🧹 Nettoyage des données existantes...');
-    await AppDataSource.query(
-    'TRUNCATE TABLE pack_products, packs, products, categories RESTART IDENTITY CASCADE',
-    );
+  await AppDataSource.query('TRUNCATE TABLE pack_products RESTART IDENTITY CASCADE');
+  await AppDataSource.query('TRUNCATE TABLE order_items RESTART IDENTITY CASCADE');
+  await AppDataSource.query('DELETE FROM orders');
+  await AppDataSource.query('TRUNCATE TABLE packs RESTART IDENTITY CASCADE');
+  await AppDataSource.query('TRUNCATE TABLE products RESTART IDENTITY CASCADE');
+  await AppDataSource.query('TRUNCATE TABLE categories RESTART IDENTITY CASCADE');
   console.log('✅ Nettoyage terminé\n');
 
   // ═══════════════════════════════════════════════════════
@@ -418,6 +422,30 @@ async function seed(): Promise<void> {
   console.log('   GET /api/v1/packs/pack-soin-capillaire');
   console.log('   GET /api/v1/packs/pack-barbier-debutant');
   console.log('   GET /api/v1/packs/pack-look-complet');
+
+  // ─── Admin par défaut ─────────────────────────────────
+  console.log('👤 Vérification de l\'admin par défaut...');
+  const userRepo = AppDataSource.getRepository(User);
+
+  const existingAdmin = await userRepo.findOne({
+    where: { email: 'admin@barbershop.local' },
+  });
+
+  if (!existingAdmin) {
+    const passwordHash = await bcrypt.hash('Admin@2025!', 12);
+    await userRepo.save({
+      email: 'admin@barbershop.local',
+      passwordHash,
+      firstName: 'Super',
+      lastName: 'Admin',
+      role: 'super_admin' as any,
+      isActive: true,
+      isVerified: true,
+    });
+    console.log('✅ Admin créé : admin@barbershop.local / Admin@2025!');
+  } else {
+    console.log('✅ Admin déjà existant — pas de modification');
+  }
 
   await AppDataSource.destroy();
   process.exit(0);
