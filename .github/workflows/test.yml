@@ -1,0 +1,131 @@
+# .github/workflows/test.yml
+name: 🧪 Tests & CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Tests unitaires + E2E
+    runs-on: ubuntu-latest
+
+    # ─── Services Docker (PostgreSQL + Redis) ───────────────
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: barbershop_dev
+          POSTGRES_USER: barber_user
+          POSTGRES_PASSWORD: barber_secret_2025
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # ─── 1. Checkout du code ──────────────────────────────
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      # ─── 2. Setup Node.js ─────────────────────────────────
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/api/package-lock.json
+
+      # ─── 3. Installer les dépendances ─────────────────────
+      - name: 📦 Installer les dépendances
+        working-directory: apps/api
+        run: npm ci
+
+      # ─── 4. Initialiser la base de données ────────────────
+      - name: 🗄️ Initialiser PostgreSQL
+        env:
+          PGPASSWORD: barber_secret_2025
+        run: |
+          psql -h localhost -U barber_user -d barbershop_dev -f infra/db/init.sql
+
+      # ─── 5. Créer le fichier .env.local pour les tests ────
+      - name: 🔧 Créer .env.local de test
+        working-directory: apps/api
+        run: |
+          cat > .env.local << 'EOF'
+          NODE_ENV=test
+          API_PORT=3000
+          FRONTEND_URL=http://localhost:3001
+          ALLOWED_ORIGINS=http://localhost:3001
+
+          JWT_SECRET=barbershop_jwt_secret_ci_32chars_minimum
+          JWT_EXPIRES_IN=15m
+          JWT_REFRESH_SECRET=barbershop_refresh_secret_ci_32chars
+          JWT_REFRESH_EXPIRES_IN=7d
+          COOKIE_SECRET=barbershop_cookie_secret_ci_32chars
+
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_USERNAME=barber_user
+          DB_PASSWORD=barber_secret_2025
+          DB_NAME=barbershop_dev
+
+          REDIS_URL=redis://localhost:6379
+          REDIS_HOST=localhost
+          REDIS_PORT=6379
+
+          SMTP_HOST=localhost
+          SMTP_PORT=1025
+          EMAIL_FROM=noreply@barbershop.local
+          EOF
+
+      # ─── 6. Linter ────────────────────────────────────────
+      - name: 🔍 Lint
+        working-directory: apps/api
+        run: npm run lint
+        continue-on-error: true  # Ne bloque pas si lint échoue
+
+      # ─── 7. Tests unitaires ───────────────────────────────
+      - name: 🧪 Tests unitaires
+        working-directory: apps/api
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      # ─── 8. Tests unitaires avec couverture ───────────────
+      - name: 📊 Couverture de code
+        working-directory: apps/api
+        run: npm run test:cov
+        env:
+          NODE_ENV: test
+
+      # ─── 9. Tests E2E ─────────────────────────────────────
+      - name: 🌐 Tests E2E
+        working-directory: apps/api
+        run: npm run test:e2e
+        env:
+          NODE_ENV: test
+
+      # ─── 10. Upload rapport de couverture ─────────────────
+      - name: 📈 Upload couverture vers Codecov (optionnel)
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          directory: apps/api/coverage
+          fail_ci_if_error: false
+        continue-on-error: true
