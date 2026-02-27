@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { UsersModule } from './modules/users/users.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -29,21 +31,17 @@ import { APP_GUARD } from '@nestjs/core';
       }),
     }),
 
-    // ─── Rate Limiting — syntaxe ThrottlerModule v6 ────────
+    // ─── Rate Limiting ─────────────────────────────────────
     ThrottlerModule.forRoot({
       throttlers: [
-        {
-          name: 'default',
-          ttl: 60000,
-          limit: 60,
-        },
-        {
-          name: 'auth',
-          ttl: 900000,
-          limit: 5,
-        },
+        { name: 'default', ttl: 60000, limit: 60 },
+        { name: 'auth', ttl: 900000, limit: 5 },
       ],
     }),
+
+    // ─── Modules métier ────────────────────────────────────
+    UsersModule,
+    AuditModule,
   ],
 
   providers: [
