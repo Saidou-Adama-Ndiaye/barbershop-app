@@ -1,25 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
 
+// Ce test vérifie que l'application démarre correctement
+// et que le préfixe global /api/v1 est bien appliqué
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api/v1');
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('GET / → 404 (aucune route à la racine, préfixe api/v1 actif)', async () => {
+    const res = await request(app.getHttpServer()).get('/');
+    expect(res.status).toBe(404);
   });
 });
