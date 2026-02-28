@@ -1,0 +1,18 @@
+{
+  "payments": [
+    {
+      "id": "a0b7b2d1-1dea-411f-a4f4-6e270f89202c",
+      "transactionId": "WAVE-1772248441819",
+      "amount": 3000,
+      "currency": "XOF",
+      "phone": "+221771234567",
+      "entityType": "booking",
+      "entityId": "test-uuid-123",
+      "status": "pending",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=a0b7b2d1-1dea-411f-a4f4-6e270f89202c",
+      "expiresAt": "2026-02-28T03:29:01.821Z",
+      "createdAt": "2026-02-28T03:14:01.869Z"
+    }
+  ],
+  "transactions": []
+}
