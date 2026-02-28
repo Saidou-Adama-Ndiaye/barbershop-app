@@ -35,6 +35,9 @@ export default function Header() {
           <Link href="/services" className="hover:text-gray-900 transition-colors">
             Réservations
           </Link>
+          <Link href="/formations" className="hover:text-gray-900 transition-colors">
+            Formations
+          </Link>
           {isAuthenticated && (
             <>
               <Link href="/commandes" className="hover:text-gray-900 transition-colors">
@@ -42,6 +45,9 @@ export default function Header() {
               </Link>
               <Link href="/mes-reservations" className="hover:text-gray-900 transition-colors">
                 Mes RDV
+              </Link>
+              <Link href="/my-formations" className="hover:text-gray-900 transition-colors">
+                Mes formations
               </Link>
             </>
           )}

@@ -12,6 +12,19 @@
       "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=a0b7b2d1-1dea-411f-a4f4-6e270f89202c",
       "expiresAt": "2026-02-28T03:29:01.821Z",
       "createdAt": "2026-02-28T03:14:01.869Z"
+    },
+    {
+      "id": "64cb9a48-a939-46ca-8060-29188f5ebf55",
+      "transactionId": "WAVE-1772309895658",
+      "amount": 35000,
+      "currency": "XOF",
+      "phone": "+221000000000",
+      "entityType": "formation",
+      "entityId": "4619a7d3-7a29-4313-bdd8-8c99e00ccf18",
+      "status": "completed",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=64cb9a48-a939-46ca-8060-29188f5ebf55",
+      "expiresAt": "2026-02-28T20:33:15.658Z",
+      "createdAt": "2026-02-28T20:18:15.659Z"
     }
   ],
   "transactions": []
