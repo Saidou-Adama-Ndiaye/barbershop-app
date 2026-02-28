@@ -32,10 +32,18 @@ export default function Header() {
           <Link href="/packs" className="hover:text-gray-900 transition-colors">
             Catalogue
           </Link>
+          <Link href="/services" className="hover:text-gray-900 transition-colors">
+            Réservations
+          </Link>
           {isAuthenticated && (
-            <Link href="/commandes" className="hover:text-gray-900 transition-colors">
-              Mes commandes
-            </Link>
+            <>
+              <Link href="/commandes" className="hover:text-gray-900 transition-colors">
+                Mes commandes
+              </Link>
+              <Link href="/mes-reservations" className="hover:text-gray-900 transition-colors">
+                Mes RDV
+              </Link>
+            </>
           )}
         </nav>
 
