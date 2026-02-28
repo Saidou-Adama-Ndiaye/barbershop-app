@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+
 
 import { UsersModule }         from './modules/users/users.module';
 import { AuditModule }         from './modules/audit/audit.module';
@@ -18,10 +20,7 @@ import { FormationsModule }    from './modules/formations/formations.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal:    true,
-      envFilePath: '.env.local',
-    }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.local' }),
 
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -46,6 +45,7 @@ import { FormationsModule }    from './modules/formations/formations.module';
       ],
     }),
 
+    ScheduleModule.forRoot(),
     StorageModule,
     UsersModule,
     AuditModule,

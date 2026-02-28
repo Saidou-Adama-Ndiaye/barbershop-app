@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rappel de rendez-vous</title>
+</head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:Arial,sans-serif">
+  <div style="max-width:600px;margin:40px auto;background:white;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
+
+    <!-- Header -->
+    <div style="background:#1d4ed8;padding:32px;text-align:center">
+      <h1 style="color:white;margin:0;font-size:28px">✂️ BarberShop</h1>
+      <p style="color:#bfdbfe;margin:8px 0 0;font-size:14px">Rappel de rendez-vous</p>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:32px">
+      <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:12px;padding:16px;margin-bottom:24px">
+        <p style="color:#1e40af;font-weight:bold;margin:0;font-size:16px">
+          ⏰ Votre rendez-vous est demain !
+        </p>
+      </div>
+
+      <p style="color:#374151;font-size:15px">
+        Bonjour <strong>{{firstName}}</strong>,
+      </p>
+      <p style="color:#374151;font-size:15px">
+        Nous vous rappelons votre rendez-vous prévu demain :
+      </p>
+
+      <table style="width:100%;border-collapse:collapse;margin:20px 0">
+        <tr style="border-bottom:1px solid #e5e7eb">
+          <td style="padding:12px 0;color:#6b7280;font-size:14px;width:40%">Numéro RDV</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{bookingNumber}}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e5e7eb">
+          <td style="padding:12px 0;color:#6b7280;font-size:14px">Formule</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{serviceName}}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e5e7eb">
+          <td style="padding:12px 0;color:#6b7280;font-size:14px">Date & heure</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{bookedAt}}</td>
+        </tr>
+        <tr>
+          <td style="padding:12px 0;color:#6b7280;font-size:14px">Durée</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{durationMin}} min</td>
+        </tr>
+      </table>
+
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px;margin:20px 0">
+        <p style="color:#166534;margin:0;font-size:13px">
+          💡 <strong>Rappel :</strong> Si vous devez annuler, faites-le avant
+          <strong>{{cancellationDeadline}}</strong> pour être remboursé de votre acompte.
+        </p>
+      </div>
+
+      <p style="color:#374151;font-size:14px">
+        À demain ! L'équipe BarberShop vous attend.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f9fafb;padding:20px;text-align:center;border-top:1px solid #e5e7eb">
+      <p style="color:#9ca3af;font-size:12px;margin:0">
+        BarberShop — Sénégal & Zone UEMOA
+      </p>
+    </div>
+  </div>
+</body>
+</html>
