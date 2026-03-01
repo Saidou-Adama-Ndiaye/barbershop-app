@@ -29,7 +29,7 @@ export class PacksService {
 
   // ─── GET /packs ───────────────────────────────────────────
   async findAll(query: QueryPackDto): Promise<{
-    data: Pack[];
+    data: (Pack & { finalPrice: number })[];
     total: number;
     page: number;
     limit: number;
@@ -53,7 +53,16 @@ export class PacksService {
 
     const [data, total] = await qb.getManyAndCount();
 
-    return { data, total, page, limit };
+    // ✅ Ajout du finalPrice sur chaque pack
+    const dataWithFinalPrice = data.map((pack) => ({
+      ...pack,
+      finalPrice: this.computeFinalPrice(
+        Number(pack.basePrice),
+        Number(pack.discountPct),
+      ),
+    }));
+
+    return { data: dataWithFinalPrice, total, page, limit };
   }
 
   // ─── GET /packs/:slug ─────────────────────────────────────

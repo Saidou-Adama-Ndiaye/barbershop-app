@@ -190,7 +190,11 @@ export class AuthService {
     role: string,
     ): { accessToken: string; refreshToken: string; refreshTokenId: string } {
     const refreshTokenId = crypto.randomUUID();
-    const payload: JwtPayload = { sub: userId, email, role };
+    const payload: JwtPayload = {
+      sub: userId, email, role,
+      firstName: '',
+      lastName: ''
+    };
 
     /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment */
     const accessToken = this.jwtService.sign(payload as any, {

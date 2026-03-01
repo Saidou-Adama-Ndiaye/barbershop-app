@@ -82,8 +82,9 @@ export class AuthController {
     });
 
     return {
-      accessToken: result.accessToken,
-      user: result.user,
+      accessToken:  result.accessToken,
+      refreshToken: result.refreshToken,
+      user:         result.user,
     };
   }
 
@@ -98,11 +99,10 @@ export class AuthController {
   @ApiCookieAuth('refresh_token')
   @ApiResponse({ status: 200, type: RefreshResponseDto })
   @ApiResponse({ status: 401, description: 'Refresh token invalide ou expiré' })
-  async refresh(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<RefreshResponseDto> {
-    const rawRefreshToken = req.cookies?.['refresh_token'] as string | undefined;
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response, @Body() body?: { refreshToken?: string }) {
+    const rawRefreshToken = req.cookies?.['refresh_token'] 
+      ?? body?.refreshToken; // ✅ fallback sur le body pour Flutter
+    
     if (!rawRefreshToken) {
       throw new UnauthorizedException('Refresh token manquant');
     }

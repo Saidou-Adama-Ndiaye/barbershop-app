@@ -17,6 +17,9 @@ export class LoginResponseDto {
 
   @ApiProperty({ type: UserProfileDto })
   user: UserProfileDto;
+
+  @ApiProperty({ description: 'Refresh token' })
+  refreshToken: string;
 }
 
 export class RegisterResponseDto {
