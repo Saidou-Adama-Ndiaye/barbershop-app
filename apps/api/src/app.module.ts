@@ -17,6 +17,8 @@ import { PaymentsModule }      from './modules/payments/payments.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { StorageModule }       from './modules/storage/storage.module';
 import { FormationsModule }    from './modules/formations/formations.module';
+import { AdminModule } from './modules/admin/admin.module';
+
 
 @Module({
   imports: [
@@ -57,6 +59,7 @@ import { FormationsModule }    from './modules/formations/formations.module';
     PaymentsModule,
     NotificationsModule,
     FormationsModule,
+    AdminModule,
   ],
 
   providers: [
