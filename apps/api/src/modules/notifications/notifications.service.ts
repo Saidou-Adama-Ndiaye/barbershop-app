@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\notifications\notifications.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';

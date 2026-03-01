@@ -1,3 +1,4 @@
+// .\.\apps\web\components\learning\VideoPlayer.tsx
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';

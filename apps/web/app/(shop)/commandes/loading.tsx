@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(shop)\commandes\loading.tsx
 export default function CommandesLoading() {
   return (
     <div className="space-y-6">

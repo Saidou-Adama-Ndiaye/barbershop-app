@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\packs.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PacksController } from './packs.controller';

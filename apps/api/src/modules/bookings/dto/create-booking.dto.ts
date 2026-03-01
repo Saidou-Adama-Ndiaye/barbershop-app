@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\bookings\dto\create-booking.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsUUID, IsDateString, IsOptional, IsString } from 'class-validator';
 

@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\services\services.controller.ts
 import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ServicesService } from './services.service';

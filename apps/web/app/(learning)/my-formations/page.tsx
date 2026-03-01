@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(learning)\my-formations\page.tsx
 'use client';
 
 import { useQuery } from '@tanstack/react-query';

@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\formations\entities\formation.entity.ts
 import {
   Entity, Column, PrimaryGeneratedColumn,
   CreateDateColumn, UpdateDateColumn,

@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\auth\strategies\jwt.strategy.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';

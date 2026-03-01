@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\bookings\dto\query-availability.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsDateString } from 'class-validator';
 

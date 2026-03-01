@@ -1,3 +1,4 @@
+// .\.\apps\web\tests\e2e\shop.spec.ts
 import { test, expect } from '@playwright/test';
 
 // ─── Helpers ──────────────────────────────────────────────

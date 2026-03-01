@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\formations\entities\video-progress.entity.ts
 import {
   Entity, Column, PrimaryGeneratedColumn,
   ManyToOne, JoinColumn, Index, Unique,

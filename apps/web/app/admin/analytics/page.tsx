@@ -1,3 +1,4 @@
+// .\.\apps\web\app\admin\analytics\page.tsx
 'use client';
 
 import { useState } from 'react';

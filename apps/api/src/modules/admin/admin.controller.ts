@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\admin\admin.controller.ts
 import {
   Controller, Get, Patch, Body, Param,
   Query, ParseUUIDPipe, UseGuards, Res,

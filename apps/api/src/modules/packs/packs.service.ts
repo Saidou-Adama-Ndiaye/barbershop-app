@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\packs.service.ts
 import {
   Injectable,
   NotFoundException,

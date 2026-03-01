@@ -1,3 +1,4 @@
+// .\.\apps\mobile\lib\features\shop\packs_provider.dart
 import 'package:barbershop_mobile/core/auth/auth_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/dio_client.dart';

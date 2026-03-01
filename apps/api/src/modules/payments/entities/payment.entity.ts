@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\payments\entities\payment.entity.ts
 import {
   Entity,
   Column,

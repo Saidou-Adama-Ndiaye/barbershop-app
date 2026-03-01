@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\users\users.service.ts
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

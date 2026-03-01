@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(booking)\layout.tsx
 import Header from '@/components/layout/Header';
 
 export default function BookingLayout({

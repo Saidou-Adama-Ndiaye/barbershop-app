@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\dto\create-pack.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,

@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(learning)\formations\[slug]\lecteur\page.tsx
 'use client';
 
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
@@ -10,7 +11,7 @@ import { useAuthStore } from '@/lib/store/auth.store';
 
 interface Video {
   id: string;
-  title: string;
+  title: string
   description: string;
   durationSec: number;
   sortOrder: number;

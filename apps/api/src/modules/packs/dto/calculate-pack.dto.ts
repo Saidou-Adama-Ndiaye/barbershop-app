@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\dto\calculate-pack.dto.ts
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsOptional, IsUUID } from 'class-validator';
 

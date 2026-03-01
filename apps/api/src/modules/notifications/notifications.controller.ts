@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\notifications\notifications.controller.ts
 import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';

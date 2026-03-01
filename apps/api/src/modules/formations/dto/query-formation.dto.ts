@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\formations\dto\query-formation.dto.ts
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsEnum, IsNumber, Min, Max, IsString } from 'class-validator';
 import { Transform, Type } from 'class-transformer';

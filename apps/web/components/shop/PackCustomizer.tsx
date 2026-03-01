@@ -1,3 +1,4 @@
+// .\.\apps\web\components\shop\PackCustomizer.tsx
 'use client';
 
 import { useState, useCallback } from 'react';

@@ -1,3 +1,4 @@
+// .\.\apps\web\components\shop\PackCard.tsx
 import Image from 'next/image';
 import Link from 'next/link';
 import Badge from '@/components/ui/Badge';

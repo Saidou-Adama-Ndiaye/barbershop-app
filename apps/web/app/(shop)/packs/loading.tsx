@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(shop)\packs\loading.tsx
 import SkeletonCard from '@/components/ui/SkeletonCard';
 
 export default function PacksLoading() {

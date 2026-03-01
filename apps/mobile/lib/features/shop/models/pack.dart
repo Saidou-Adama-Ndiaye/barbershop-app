@@ -1,3 +1,4 @@
+// .\.\apps\mobile\lib\features\shop\models\pack.dart
 class Pack {
   final String  id;
   final String  name;

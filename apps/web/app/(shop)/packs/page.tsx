@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(shop)\packs\page.tsx
 'use client';
 
 import { useState } from 'react';

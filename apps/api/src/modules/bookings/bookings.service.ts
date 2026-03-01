@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\bookings\bookings.service.ts
 import {
   Injectable,
   NotFoundException,

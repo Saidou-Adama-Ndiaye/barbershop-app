@@ -1,3 +1,4 @@
+// .\.\apps\web\lib\api.ts
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 // ─── Instance principale ──────────────────────────────────

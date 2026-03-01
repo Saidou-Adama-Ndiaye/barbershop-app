@@ -1,3 +1,4 @@
+// .\.\apps\api\src\database\seeds\seed.ts
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';

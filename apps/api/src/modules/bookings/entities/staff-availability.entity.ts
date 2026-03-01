@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\bookings\entities\staff-availability.entity.ts
 import {
   Entity,
   Column,

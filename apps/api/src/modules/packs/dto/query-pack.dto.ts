@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\dto\query-pack.dto.ts
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';

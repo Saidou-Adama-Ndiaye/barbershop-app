@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\notifications\entities\notification-log.entity.ts
 import {
   Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn,
 } from 'typeorm';

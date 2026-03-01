@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\entities\category.entity.ts
 import {
   Entity,
   Column,

@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\products.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { PacksService } from './packs.service';

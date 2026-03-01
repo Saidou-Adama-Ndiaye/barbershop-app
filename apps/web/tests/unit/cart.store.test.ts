@@ -1,3 +1,4 @@
+// .\.\apps\web\tests\unit\cart.store.test.ts
 /**
  * Tests unitaires — cart.store.ts
  * Exécution : npx jest tests/cart.store.test.ts

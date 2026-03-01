@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\auth\dto\auth-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../../users/entities/user.entity';
 

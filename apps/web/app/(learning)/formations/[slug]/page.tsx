@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(learning)\formations\[slug]\page.tsx
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';

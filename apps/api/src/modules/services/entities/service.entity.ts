@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\services\entities\service.entity.ts
 import {
   Entity,
   Column,

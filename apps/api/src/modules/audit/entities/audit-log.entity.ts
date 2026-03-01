@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\audit\entities\audit-log.entity.ts
 import {
   Entity,
   Column,

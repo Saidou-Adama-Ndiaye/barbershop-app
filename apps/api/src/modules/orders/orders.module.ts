@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\orders\orders.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdersController } from './orders.controller';

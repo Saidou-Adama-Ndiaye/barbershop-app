@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\formations\entities\video.entity.ts
 import {
   Entity, Column, PrimaryGeneratedColumn,
   CreateDateColumn, UpdateDateColumn,

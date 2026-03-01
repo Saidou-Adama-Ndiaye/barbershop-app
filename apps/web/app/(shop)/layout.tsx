@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(shop)\layout.tsx
 import Header from '@/components/layout/Header';
 
 export default function ShopLayout({ children }: { children: React.ReactNode }) {

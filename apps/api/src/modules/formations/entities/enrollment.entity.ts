@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\formations\entities\enrollment.entity.ts
 import {
   Entity, Column, PrimaryGeneratedColumn,
   CreateDateColumn, ManyToOne, JoinColumn, Index, Unique,

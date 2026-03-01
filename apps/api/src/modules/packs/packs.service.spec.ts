@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\packs.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { PacksService } from './packs.service';
 import { getRepositoryToken } from '@nestjs/typeorm';

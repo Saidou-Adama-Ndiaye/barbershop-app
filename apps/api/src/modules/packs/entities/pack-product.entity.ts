@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\packs\entities\pack-product.entity.ts
 import {
   Entity,
   Column,

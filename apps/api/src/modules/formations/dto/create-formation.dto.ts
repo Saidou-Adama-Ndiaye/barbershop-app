@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\formations\dto\create-formation.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString, IsNumber, IsEnum, IsOptional,

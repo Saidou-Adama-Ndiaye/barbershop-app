@@ -1,3 +1,4 @@
+// .\.\apps\mobile\lib\features\shop\packs_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/auth/auth_service.dart';

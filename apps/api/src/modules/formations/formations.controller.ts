@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\formations\formations.controller.ts
 import {
   Controller, Get, Post, Body, Param,
   Query, ParseUUIDPipe, UseGuards,

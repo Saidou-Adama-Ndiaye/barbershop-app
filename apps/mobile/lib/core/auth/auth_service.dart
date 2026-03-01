@@ -1,3 +1,4 @@
+// .\.\apps\mobile\lib\core\auth\auth_service.dart
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/dio_client.dart';

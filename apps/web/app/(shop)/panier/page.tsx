@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(shop)\panier\page.tsx
 'use client';
 
 import { useCartStore } from '@/lib/store/cart.store';

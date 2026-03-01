@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\bookings\bookings.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Booking } from './entities/booking.entity';

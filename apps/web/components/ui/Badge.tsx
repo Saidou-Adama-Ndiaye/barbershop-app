@@ -1,3 +1,4 @@
+// .\.\apps\web\components\ui\Badge.tsx
 interface BadgeProps {
   children: React.ReactNode;
   variant?: 'green' | 'red' | 'orange' | 'blue' | 'gray';

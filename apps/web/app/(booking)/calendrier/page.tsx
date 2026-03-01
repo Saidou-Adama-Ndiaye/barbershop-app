@@ -1,3 +1,4 @@
+// .\.\apps\web\app\(booking)\calendrier\page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';

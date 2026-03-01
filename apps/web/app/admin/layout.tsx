@@ -1,3 +1,4 @@
+// .\.\apps\web\app\admin\layout.tsx
 'use client';
 
 import { useEffect } from 'react';

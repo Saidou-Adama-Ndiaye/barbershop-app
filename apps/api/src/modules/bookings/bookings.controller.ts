@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\bookings\bookings.controller.ts
 import {
   Controller,
   Get,

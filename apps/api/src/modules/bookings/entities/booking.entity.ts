@@ -1,3 +1,4 @@
+// .\.\apps\api\src\modules\bookings\entities\booking.entity.ts
 import {
   Entity,
   Column,
