@@ -1,25 +1,33 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Routes nécessitant une authentification
-const PROTECTED_ROUTES = ['/commandes', '/admin'];
+const PROTECTED_ROUTES = ['/commandes', '/mes-reservations', '/my-formations'];
+const ADMIN_ROUTES     = ['/admin'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isProtected = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route),
-  );
-
-  if (isProtected) {
-    // Vérifier la présence du cookie refresh_token
-    // (le access_token est en mémoire → non accessible depuis middleware)
+  // ─── Routes admin ──────────────────────────────────
+  const isAdminRoute = ADMIN_ROUTES.some((r) => pathname.startsWith(r));
+  if (isAdminRoute) {
     const refreshToken = request.cookies.get('refresh_token');
-
     if (!refreshToken) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(
+        new URL(`/login?redirect=${pathname}`, request.url),
+      );
+    }
+    // Note : la vérification du rôle se fait côté client dans le layout
+    return NextResponse.next();
+  }
+
+  // ─── Routes protégées standard ──────────────────────
+  const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
+  if (isProtected) {
+    const refreshToken = request.cookies.get('refresh_token');
+    if (!refreshToken) {
+      return NextResponse.redirect(
+        new URL(`/login?redirect=${pathname}`, request.url),
+      );
     }
   }
 
@@ -27,5 +35,10 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/commandes/:path*', '/admin/:path*'],
+  matcher: [
+    '/commandes/:path*',
+    '/mes-reservations/:path*',
+    '/my-formations/:path*',
+    '/admin/:path*',
+  ],
 };
