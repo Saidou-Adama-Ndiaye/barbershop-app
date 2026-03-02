@@ -4,7 +4,7 @@ import { IsString, IsNumber, IsUUID } from 'class-validator';
 
 export class WebhookWaveDto {
   @ApiProperty()
-  @IsUUID()
+  @IsUUID('all')
   paymentId: string;
 
   @ApiProperty()

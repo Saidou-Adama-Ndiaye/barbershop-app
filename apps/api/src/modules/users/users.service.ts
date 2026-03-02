@@ -34,6 +34,18 @@ export class UsersService {
     });
   }
 
+  // ─── Liste des coiffeurs actifs (pour le calendrier) ────────────
+  async findStaff(): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'role'>[]> {
+    return this.userRepository.find({
+      where: {
+        role: UserRole.COIFFEUR,
+        isActive: true,
+      },
+      select: ['id', 'firstName', 'lastName', 'role'],
+      order: { firstName: 'ASC' },
+    });
+  }
+
   // Créer un utilisateur
   async create(data: {
     email: string;
@@ -59,6 +71,7 @@ export class UsersService {
 
     return this.userRepository.save(user);
   }
+
 
   // Mettre à jour la date de dernière connexion
   async updateLastLogin(userId: string): Promise<void> {

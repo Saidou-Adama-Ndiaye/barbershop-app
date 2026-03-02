@@ -5,7 +5,7 @@ import { IsOptional, IsString, IsUUID } from 'class-validator';
 export class QueryCalendarDto {
   @ApiPropertyOptional({ example: 'uuid-staff' })
   @IsOptional()
-  @IsUUID()
+  @IsUUID('all')
   staffId?: string;
 
   @ApiPropertyOptional({ example: '2025-09-01' })

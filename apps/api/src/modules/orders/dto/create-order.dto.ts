@@ -14,7 +14,7 @@ import { Type } from 'class-transformer';
 
 export class OrderItemDto {
   @ApiProperty({ example: 'uuid-pack' })
-  @IsUUID()
+  @IsUUID('all')
   packId: string;
 
   @ApiProperty({ example: 1 })

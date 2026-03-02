@@ -144,7 +144,7 @@ export class AuthController {
 
   // ─── GET /auth/profile ────────────────────────────────────
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('me')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: "Obtenir le profil de l'utilisateur connecté" })
   @ApiResponse({ status: 200, description: 'Profil utilisateur' })

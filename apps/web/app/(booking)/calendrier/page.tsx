@@ -89,11 +89,9 @@ export default function CalendrierPage() {
   const { data: staffList } = useQuery({
     queryKey: ['staff'],
     queryFn: async () => {
-      // On utilise le compte admin seed comme coiffeur disponible
       const { data } = await api.get<StaffMember[]>('/users/staff');
       return data;
     },
-    // Si endpoint inexistant, fallback sur l'admin seed
     retry: false,
   });
 
@@ -218,22 +216,20 @@ export default function CalendrierPage() {
           <div>
             <h2 className="font-semibold text-gray-900 mb-3">Coiffeur</h2>
             <div className="space-y-2">
-              {/* Coiffeur par défaut (admin seed) */}
-              {[{ id: 'admin-seed', name: 'Moussa Diallo (Admin)' }].map((staff) => (
-                <button
-                  key={staff.id}
-                  onClick={() => setSelectedStaff(staff.id)}
-                  className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
-                    selectedStaff === staff.id
-                      ? 'border-gray-900 bg-gray-900 text-white'
-                      : 'border-gray-200 hover:border-gray-400'
-                  }`}
-                >
-                  <span className="font-medium">{staff.name}</span>
-                </button>
-              ))}
 
               {/* Coiffeurs depuis API si disponibles */}
+              {!staffList && (
+                <p className="text-sm text-gray-400 py-4 text-center">
+                  Chargement des coiffeurs...
+                </p>
+              )}
+
+              {staffList?.length === 0 && (
+                <p className="text-sm text-gray-400 py-4 text-center">
+                  Aucun coiffeur disponible
+                </p>
+              )}
+
               {staffList?.map((staff) => (
                 <button
                   key={staff.id}

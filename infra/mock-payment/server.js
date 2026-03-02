@@ -1,4 +1,4 @@
-// .\.\infra\mock-payment\server.js
+// .\.\infra\mock-payment\server.js  => Server Express
 import express from 'express';
 import crypto from 'crypto';
 import http from 'http';

@@ -4,11 +4,11 @@ import { IsUUID, IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class CreateBookingDto {
   @ApiProperty({ example: 'uuid-service' })
-  @IsUUID()
+  @IsUUID('all')
   serviceId: string;
 
   @ApiProperty({ example: 'uuid-staff' })
-  @IsUUID()
+  @IsUUID('all')
   staffId: string;
 
   @ApiProperty({ example: '2025-08-15T09:00:00.000Z' })

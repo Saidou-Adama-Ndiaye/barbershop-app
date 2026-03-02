@@ -18,7 +18,7 @@ import { Type } from 'class-transformer';
 
 export class PackProductItemDto {
   @ApiProperty({ example: 'uuid-produit' })
-  @IsUUID()
+  @IsUUID('all')
   productId: string;
 
   @ApiProperty({ example: 1 })
@@ -75,7 +75,7 @@ export class CreatePackDto {
 
   @ApiPropertyOptional({ example: 'uuid-categorie' })
   @IsOptional()
-  @IsUUID()
+  @IsUUID('all')
   categoryId?: string;
 
   @ApiPropertyOptional({ type: [PackProductItemDto] })

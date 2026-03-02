@@ -25,6 +25,58 @@
       "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=64cb9a48-a939-46ca-8060-29188f5ebf55",
       "expiresAt": "2026-02-28T20:33:15.658Z",
       "createdAt": "2026-02-28T20:18:15.659Z"
+    },
+    {
+      "id": "73633fdf-9032-42bc-98b1-7317eab3e4c2",
+      "transactionId": "WAVE-1772347444890",
+      "amount": 6000,
+      "currency": "XOF",
+      "phone": "+221000000000",
+      "entityType": "booking",
+      "entityId": "eaac3887-a0c1-4303-b773-bfb381d6ff22",
+      "status": "completed",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=73633fdf-9032-42bc-98b1-7317eab3e4c2",
+      "expiresAt": "2026-03-01T06:59:04.890Z",
+      "createdAt": "2026-03-01T06:44:04.896Z"
+    },
+    {
+      "id": "0d683b18-a6fa-4721-b577-66d037f983a4",
+      "transactionId": "WAVE-1772349660126",
+      "amount": 1500,
+      "currency": "XOF",
+      "phone": "+221000000000",
+      "entityType": "booking",
+      "entityId": "599582b4-bf15-4202-8f30-e48d9ec64e1b",
+      "status": "completed",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=0d683b18-a6fa-4721-b577-66d037f983a4",
+      "expiresAt": "2026-03-01T07:36:00.126Z",
+      "createdAt": "2026-03-01T07:21:00.132Z"
+    },
+    {
+      "id": "6b248683-3a7f-428d-88be-51622b75b285",
+      "transactionId": "WAVE-1772349832420",
+      "amount": 1500,
+      "currency": "XOF",
+      "phone": "+221000000000",
+      "entityType": "booking",
+      "entityId": "6569dc64-e500-46d7-80d5-8f11a50a1662",
+      "status": "completed",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=6b248683-3a7f-428d-88be-51622b75b285",
+      "expiresAt": "2026-03-01T07:38:52.421Z",
+      "createdAt": "2026-03-01T07:23:52.421Z"
+    },
+    {
+      "id": "106e9741-d118-4172-a92d-4fa309221cc4",
+      "transactionId": "WAVE-1772349933216",
+      "amount": 3000,
+      "currency": "XOF",
+      "phone": "+221000000000",
+      "entityType": "booking",
+      "entityId": "3f18dc8b-6817-4d27-9ba3-b1772e60df94",
+      "status": "pending",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=106e9741-d118-4172-a92d-4fa309221cc4",
+      "expiresAt": "2026-03-01T07:40:33.216Z",
+      "createdAt": "2026-03-01T07:25:33.216Z"
     }
   ],
   "transactions": []

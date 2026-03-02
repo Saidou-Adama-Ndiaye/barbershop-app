@@ -4,7 +4,7 @@ import { IsUUID, IsDateString } from 'class-validator';
 
 export class QueryAvailabilityDto {
   @ApiProperty({ example: 'uuid-staff' })
-  @IsUUID()
+  @IsUUID('all')
   staffId: string;
 
   @ApiProperty({ example: '2025-08-15' })
@@ -12,6 +12,6 @@ export class QueryAvailabilityDto {
   date: string;
 
   @ApiProperty({ example: 'uuid-service' })
-  @IsUUID()
+  @IsUUID('all')
   serviceId: string;
 }
