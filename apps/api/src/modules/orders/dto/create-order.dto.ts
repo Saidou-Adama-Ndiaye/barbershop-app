@@ -67,4 +67,10 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  // ─── NOUVEAU Sprint 7 ────────────────────────────────
+  @ApiPropertyOptional({ example: 'PROMO10', description: 'Code promo optionnel' })
+  @IsOptional()
+  @IsString()
+  couponCode?: string;
 }

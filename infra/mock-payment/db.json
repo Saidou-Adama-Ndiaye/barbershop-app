@@ -77,6 +77,32 @@
       "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=106e9741-d118-4172-a92d-4fa309221cc4",
       "expiresAt": "2026-03-01T07:40:33.216Z",
       "createdAt": "2026-03-01T07:25:33.216Z"
+    },
+    {
+      "id": "f86c0d8e-bdb0-42d2-80c4-2551472a71f6",
+      "transactionId": "WAVE-1772512082721",
+      "amount": 15000,
+      "currency": "XOF",
+      "phone": "+221000000000",
+      "entityType": "formation",
+      "entityId": "c6e149e7-471e-40b2-b152-c0d24ca4d2fe",
+      "status": "completed",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=f86c0d8e-bdb0-42d2-80c4-2551472a71f6",
+      "expiresAt": "2026-03-03T04:43:02.721Z",
+      "createdAt": "2026-03-03T04:28:02.722Z"
+    },
+    {
+      "id": "eeb3f05b-0146-4f46-a1d4-72eb075f87db",
+      "transactionId": "WAVE-1772579909559",
+      "amount": 1500,
+      "currency": "XOF",
+      "phone": "+221000000000",
+      "entityType": "booking",
+      "entityId": "77ad3c2e-5719-4671-a317-edea221f1ad1",
+      "status": "completed",
+      "redirectUrl": "http://localhost:3002/pay-simulation?paymentId=eeb3f05b-0146-4f46-a1d4-72eb075f87db",
+      "expiresAt": "2026-03-03T23:33:29.559Z",
+      "createdAt": "2026-03-03T23:18:29.569Z"
     }
   ],
   "transactions": []

@@ -1,0 +1,159 @@
+﻿============================================================
+  ARCHITECTURE DU MONOREPO : barbershop-app
+  Genere le : 2026-03-04 06:15:06
+============================================================
+
+[DIR]  apps/
++-- [DIR]  web/
+    |-- [DIR]  lib/
+    |   |-- [DIR]  store/
+    |   |   |-- [FILE] toast.store.ts
+    |   |   |-- [FILE] wishlist.store.ts
+    |   |   |-- [FILE] auth.store.ts
+    |   |   +-- [FILE] cart.store.ts
+    |   |-- [DIR]  coiffeur/
+    |   |   +-- [FILE] api.ts
+    |   |-- [DIR]  admin/
+    |   |   +-- [FILE] api.ts
+    |   |-- [FILE] reviews.ts
+    |   |-- [FILE] types.ts
+    |   |-- [FILE] wishlist.ts
+    |   |-- [FILE] profile.ts
+    |   |-- [FILE] api.ts
+    |   |-- [FILE] auth.ts
+    |   +-- [FILE] coupons.ts
+    |-- [DIR]  app/
+    |   |-- [DIR]  (shop)/
+    |   |   |-- [DIR]  panier/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  wishlist/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  commandes/
+    |   |   |   |-- [FILE] page.tsx
+    |   |   |   +-- [FILE] loading.tsx
+    |   |   |-- [DIR]  packs/
+    |   |   |   |-- [DIR]  [slug]/
+    |   |   |   |-- [FILE] page.tsx
+    |   |   |   +-- [FILE] loading.tsx
+    |   |   +-- [FILE] layout.tsx
+    |   |-- [DIR]  (profile)/
+    |   |   |-- [DIR]  reset-password/
+    |   |   |   +-- [DIR]  [token]/
+    |   |   |-- [DIR]  verify-email/
+    |   |   |   +-- [DIR]  [token]/
+    |   |   |-- [DIR]  forgot-password/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  profil/
+    |   |   |   |-- [DIR]  adresses/
+    |   |   |   |   +-- [FILE] page.tsx
+    |   |   |   +-- [FILE] page.tsx
+    |   |   +-- [FILE] layout.tsx
+    |   |-- [DIR]  fonts/
+    |   |   |-- [FILE] GeistVF.woff
+    |   |   +-- [FILE] GeistMonoVF.woff
+    |   |-- [DIR]  admin/
+    |   |   |-- [DIR]  produits/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  planning/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  packs/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  reviews/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  utilisateurs/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  stock/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  services/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  coiffeurs/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  categories/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  analytics/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  commandes/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  logs/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  formations/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  coupons/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [FILE] page.tsx
+    |   |   +-- [FILE] layout.tsx
+    |   |-- [DIR]  (booking)/
+    |   |   |-- [DIR]  services/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  mes-reservations/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  calendrier/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   +-- [FILE] layout.tsx
+    |   |-- [DIR]  (auth)/
+    |   |   |-- [DIR]  register/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  login/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   +-- [FILE] layout.tsx
+    |   |-- [DIR]  (learning)/
+    |   |   |-- [DIR]  my-formations/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   |-- [DIR]  formations/
+    |   |   |   |-- [DIR]  [slug]/
+    |   |   |   +-- [FILE] page.tsx
+    |   |   +-- [FILE] layout.tsx
+    |   |-- [DIR]  (coiffeur)/
+    |   |   |-- [DIR]  coiffeur/
+    |   |   |   |-- [DIR]  planning/
+    |   |   |   |   +-- [FILE] page.tsx
+    |   |   |   |-- [DIR]  rdv/
+    |   |   |   |   +-- [FILE] page.tsx
+    |   |   |   |-- [DIR]  stats/
+    |   |   |   |   +-- [FILE] page.tsx
+    |   |   |   |-- [DIR]  clients/
+    |   |   |   |   +-- [FILE] page.tsx
+    |   |   |   |-- [DIR]  dashboard/
+    |   |   |   |   +-- [FILE] page.tsx
+    |   |   |   +-- [DIR]  disponibilites/
+    |   |   |       +-- [FILE] page.tsx
+    |   |   +-- [FILE] layout.tsx
+    |   |-- [FILE] page.tsx
+    |   |-- [FILE] providers.tsx
+    |   |-- [FILE] layout.tsx
+    |   |-- [FILE] favicon.ico
+    |   +-- [FILE] globals.css
+    |-- [DIR]  components/
+    |   |-- [DIR]  learning/
+    |   |   +-- [FILE] VideoPlayer.tsx
+    |   |-- [DIR]  shop/
+    |   |   |-- [FILE] StarRating.tsx
+    |   |   |-- [FILE] WishlistButton.tsx
+    |   |   |-- [FILE] ReviewsSection.tsx
+    |   |   |-- [FILE] PackCard.tsx
+    |   |   +-- [FILE] PackCustomizer.tsx
+    |   |-- [DIR]  ui/
+    |   |   |-- [FILE] ToastContainer.tsx
+    |   |   |-- [FILE] SkeletonCard.tsx
+    |   |   +-- [FILE] Badge.tsx
+    |   |-- [DIR]  admin/
+    |   |-- [DIR]  booking/
+    |   +-- [DIR]  layout/
+    |       +-- [FILE] Header.tsx
+    |-- [FILE] postcss.config.mjs
+    |-- [FILE] playwright.config.ts
+    |-- [FILE] package.json
+    |-- [FILE] README.md
+    |-- [FILE] tsconfig.tsbuildinfo
+    |-- [FILE] tsconfig.json
+    |-- [FILE] tailwind.config.ts
+    |-- [FILE] package-lock.json
+    |-- [FILE] .gitignore
+    |-- [FILE] .eslintrc.json
+    |-- [FILE] .env.local
+    |-- [FILE] jest.config.ts
+    |-- [FILE] next.config.mjs
+    |-- [FILE] next-env.d.ts
+    +-- [FILE] middleware.ts
+
+

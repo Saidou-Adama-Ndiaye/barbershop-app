@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rappel RDV dans 1 heure</title>
+</head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:Arial,sans-serif">
+  <div style="max-width:600px;margin:40px auto;background:white;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
+
+    <!-- Header -->
+    <div style="background:#111827;padding:32px;text-align:center">
+      <h1 style="color:white;margin:0;font-size:28px;letter-spacing:-0.5px">✂️ BarberShop</h1>
+      <p style="color:#9ca3af;margin:8px 0 0;font-size:14px">Rappel — RDV dans 1 heure</p>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:32px">
+      <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:12px;padding:16px;margin-bottom:24px">
+        <p style="color:#92400e;font-weight:bold;margin:0;font-size:16px">
+          ⏰ Rappel : vous avez un RDV dans 1 heure !
+        </p>
+      </div>
+
+      <p style="color:#374151;font-size:15px">
+        Bonjour <strong>{{staffFirstName}}</strong>,
+      </p>
+      <p style="color:#374151;font-size:15px">
+        Voici un rappel pour votre prochain rendez-vous :
+      </p>
+
+      <table style="width:100%;border-collapse:collapse;margin:20px 0">
+        <tr style="border-bottom:1px solid #e5e7eb">
+          <td style="padding:12px 0;color:#6b7280;font-size:14px;width:40%">N° Réservation</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{bookingNumber}}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e5e7eb">
+          <td style="padding:12px 0;color:#6b7280;font-size:14px">Client</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{clientName}}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e5e7eb">
+          <td style="padding:12px 0;color:#6b7280;font-size:14px">Formule</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{serviceName}}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e5e7eb">
+          <td style="padding:12px 0;color:#6b7280;font-size:14px">Heure</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px;color:#dc2626">
+            🕐 {{bookedAt}}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:12px 0;color:#6b7280;font-size:14px">Durée</td>
+          <td style="padding:12px 0;font-weight:bold;font-size:14px">{{durationMin}} min</td>
+        </tr>
+      </table>
+
+      {{#if staffNotes}}
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:16px;margin:20px 0">
+        <p style="color:#0369a1;margin:0 0 6px;font-size:13px;font-weight:bold">
+          📝 Vos notes sur ce client :
+        </p>
+        <p style="color:#0369a1;margin:0;font-size:13px">{{staffNotes}}</p>
+      </div>
+      {{/if}}
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f9fafb;padding:20px;text-align:center;border-top:1px solid #e5e7eb">
+      <p style="color:#9ca3af;font-size:12px;margin:0">
+        BarberShop — Produits & Accessoires Professionnels<br>
+        Sénégal & Zone UEMOA
+      </p>
+    </div>
+  </div>
+</body>
+</html>

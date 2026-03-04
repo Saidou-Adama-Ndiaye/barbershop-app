@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+    .card { background: #fff; border-radius: 8px; padding: 24px; max-width: 480px; margin: auto; border-left: 4px solid #f59e0b; }
+    h2 { color: #92400e; }
+    .badge { display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 999px; font-weight: bold; font-size: 1.1em; }
+    .info { margin-top: 16px; color: #555; line-height: 1.6; }
+    .footer { margin-top: 24px; font-size: 0.8em; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>⚠️ Alerte Stock Bas</h2>
+    <p class="info">
+      Le produit <strong>{{ productName }}</strong> (SKU : <code>{{ sku }}</code>)
+      est passé sous le seuil critique.
+    </p>
+    <p>
+      Stock actuel : <span class="badge">{{ stockQty }} unités</span>
+    </p>
+    <p class="info">
+      Seuil d'alerte : {{ threshold }} unités<br/>
+      Date de l'alerte : {{ alertDate }}
+    </p>
+    <p class="info">
+      Veuillez réapprovisionner ce produit dès que possible pour éviter
+      toute rupture de stock lors des prochaines commandes.
+    </p>
+    <div class="footer">BarberShop — Système de gestion automatique des stocks</div>
+  </div>
+</body>
+</html>

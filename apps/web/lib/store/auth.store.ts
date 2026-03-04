@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   firstName: string;
   lastName: string;
+  phone: string;
   role: 'super_admin' | 'admin' | 'coiffeur_professionnel' | 'client';
   isVerified: boolean;
   createdAt: string;

@@ -12,6 +12,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { Pack } from '../packs/entities/pack.entity';
 import { Product } from '../packs/entities/product.entity';
 import { AuditService } from '../audit/audit.service';
+import { CouponsService } from '../coupons/coupons.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UserRole } from '../users/entities/user.entity';
@@ -30,14 +31,11 @@ export class OrdersService {
     @InjectDataSource()
     private readonly dataSource: DataSource,
     private readonly auditService: AuditService,
+    private readonly couponsService: CouponsService,
   ) {}
 
   // ─── POST /orders ─────────────────────────────────────────
-  async createOrder(
-    userId: string,
-    dto: CreateOrderDto,
-  ): Promise<Order> {
-    // Transaction atomique : stock + order en une seule opération
+  async createOrder(userId: string, dto: CreateOrderDto): Promise<Order> {
     return this.dataSource.transaction(async (manager) => {
       let totalAmount = 0;
       const orderItems: Partial<OrderItem>[] = [];
@@ -50,9 +48,7 @@ export class OrdersService {
         });
 
         if (!pack) {
-          throw new NotFoundException(
-            `Pack ${item.packId} introuvable ou inactif`,
-          );
+          throw new NotFoundException(`Pack ${item.packId} introuvable ou inactif`);
         }
 
         // 2. Vérifier le stock de chaque produit du pack
@@ -63,9 +59,7 @@ export class OrdersService {
           });
 
           if (!product) {
-            throw new NotFoundException(
-              `Produit ${pp.productId} introuvable`,
-            );
+            throw new NotFoundException(`Produit ${pp.productId} introuvable`);
           }
 
           if (product.stockQty < neededQty) {
@@ -75,40 +69,38 @@ export class OrdersService {
           }
         }
 
-        // 3. Calculer le prix de l'item (basePrice * qty avec discount)
+        // 3. Calculer le prix de l'item
         const discountAmount =
           (Number(pack.basePrice) * Number(pack.discountPct)) / 100;
-        const finalPrice = Math.round(
-          Number(pack.basePrice) - discountAmount,
-        );
-        const itemTotal = finalPrice * item.quantity;
+        const finalPrice = Math.round(Number(pack.basePrice) - discountAmount);
+        const itemTotal  = finalPrice * item.quantity;
         totalAmount += itemTotal;
 
-        // 4. Créer le snapshot du pack (immuable dans la commande)
+        // 4. Snapshot immuable du pack
         const packSnapshot = {
-          id: pack.id,
-          name: pack.name,
-          slug: pack.slug,
+          id:        pack.id,
+          name:      pack.name,
+          slug:      pack.slug,
           basePrice: Number(pack.basePrice),
           discountPct: Number(pack.discountPct),
           finalPrice,
           products: pack.packProducts.map((pp) => ({
-            id: pp.productId,
-            name: pp.product.name,
+            id:        pp.productId,
+            name:      pp.product.name,
             unitPrice: Number(pp.product.unitPrice),
-            quantity: pp.quantity,
+            quantity:  pp.quantity,
           })),
         };
 
         orderItems.push({
-          packId: pack.id,
+          packId:         pack.id,
           packSnapshot,
-          quantity: item.quantity,
-          unitPrice: finalPrice,
+          quantity:       item.quantity,
+          unitPrice:      finalPrice,
           customizations: item.customizations ?? {},
         });
 
-        // 5. Décrémenter le stock de chaque produit
+        // 5. Décrémenter le stock
         for (const pp of pack.packProducts) {
           const neededQty = pp.quantity * item.quantity;
           await manager.decrement(
@@ -120,7 +112,22 @@ export class OrdersService {
         }
       }
 
-      // 6. Générer le numéro de commande BS-YYYY-NNNNN
+      // ─── NOUVEAU : Appliquer le coupon ─────────────────
+      let couponCode: string | null     = null;
+      let couponDiscount                = 0;
+
+      if (dto.couponCode?.trim()) {
+        const couponResult = await this.couponsService.applyCoupon(
+          dto.couponCode.trim(),
+          totalAmount,
+        );
+        couponDiscount = couponResult.discountAmount;
+        couponCode     = dto.couponCode.trim().toUpperCase();
+        totalAmount    = couponResult.finalAmount;
+      }
+      // ──────────────────────────────────────────────────
+
+      // 6. Numéro de commande
       const orderNumber = await this.generateOrderNumber(manager);
 
       // 7. Créer la commande
@@ -128,32 +135,36 @@ export class OrdersService {
         userId,
         orderNumber,
         totalAmount,
-        currency: 'XOF',
+        currency:        'XOF',
         deliveryAddress: dto.deliveryAddress
-            ? (dto.deliveryAddress as unknown as Record<string, unknown>)
-            : undefined,
-        notes: dto.notes,
-        status: OrderStatus.PENDING,
+          ? (dto.deliveryAddress as unknown as Record<string, unknown>)
+          : undefined,
+        notes:           dto.notes,
+        status:          OrderStatus.PENDING,
+        couponCode,
+        discountAmount:  couponDiscount,
       });
 
       const savedOrder = await manager.save(Order, order);
 
-      // 8. Créer les items avec l'orderId
+      // 8. Créer les items
       const itemsToSave = orderItems.map((item) => ({
         ...item,
         orderId: savedOrder.id,
       }));
       await manager.save(OrderItem, itemsToSave);
 
-      // 9. Audit log (fire-and-forget)
+      // 9. Audit log
       this.auditService.log({
         userId,
-        action: 'CREATE_ORDER',
+        action:     'CREATE_ORDER',
         entityType: 'Order',
-        entityId: savedOrder.id,
+        entityId:   savedOrder.id,
         metadata: {
           orderNumber,
           totalAmount,
+          couponCode,
+          discountAmount: couponDiscount,
           itemCount: dto.items.length,
         },
       });
@@ -167,16 +178,12 @@ export class OrdersService {
   }
 
   // ─── GET /orders ──────────────────────────────────────────
-  async findAll(
-    userId: string,
-    userRole: UserRole,
-  ): Promise<Order[]> {
+  async findAll(userId: string, userRole: UserRole): Promise<Order[]> {
     const qb = this.orderRepository
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.items', 'items')
       .orderBy('order.createdAt', 'DESC');
 
-    // Admin voit toutes les commandes, client voit les siennes
     if (userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN) {
       qb.where('order.userId = :userId', { userId });
     }
@@ -193,7 +200,6 @@ export class OrdersService {
 
     if (!order) throw new NotFoundException(`Commande introuvable`);
 
-    // Un client ne peut voir que ses propres commandes
     const isAdmin =
       userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN;
     if (!isAdmin && order.userId !== userId) {
@@ -218,24 +224,19 @@ export class OrdersService {
 
     this.auditService.log({
       userId,
-      action: 'CANCEL_ORDER',
+      action:     'CANCEL_ORDER',
       entityType: 'Order',
-      entityId: id,
+      entityId:   id,
     });
 
     return saved;
   }
 
-  // ─── PATCH /orders/:id/status (admin) ────────────────────
-  async updateStatus(
-    id: string,
-    dto: UpdateOrderStatusDto,
-    userId: string,
-  ): Promise<Order> {
+  // ─── PATCH /orders/:id/status (admin) ─────────────────────
+  async updateStatus(id: string, dto: UpdateOrderStatusDto, userId: string): Promise<Order> {
     const order = await this.orderRepository.findOne({ where: { id } });
     if (!order) throw new NotFoundException(`Commande introuvable`);
 
-    // Vérifier la transition autorisée
     const allowedTransitions = ORDER_STATUS_TRANSITIONS[order.status];
     if (!allowedTransitions.includes(dto.status)) {
       throw new BadRequestException(
@@ -245,29 +246,29 @@ export class OrdersService {
     }
 
     order.status = dto.status;
-    const saved = await this.orderRepository.save(order);
+    await this.orderRepository.save(order);
 
     this.auditService.log({
       userId,
-      action: 'UPDATE_ORDER_STATUS',
+      action:     'UPDATE_ORDER_STATUS',
       entityType: 'Order',
-      entityId: id,
-      metadata: { from: order.status, to: dto.status },
+      entityId:   id,
+      metadata:   { from: order.status, to: dto.status },
     });
 
-    return saved;
+    return this.orderRepository.findOneOrFail({
+      where:     { id },
+      relations: ['items'],
+    });
   }
 
-  // ─── Helper : générer order_number ───────────────────────
-  private async generateOrderNumber(
-    manager: EntityManager,
-    ): Promise<string> {
-    const year = new Date().getFullYear();
-
+  // ─── Helper : générer order_number ────────────────────────
+  private async generateOrderNumber(manager: EntityManager): Promise<string> {
+    const year  = new Date().getFullYear();
     const count = await manager
-        .createQueryBuilder(Order, 'order')
-        .where('EXTRACT(YEAR FROM order.createdAt) = :year', { year })
-        .getCount();
+      .createQueryBuilder(Order, 'order')
+      .where('EXTRACT(YEAR FROM order.createdAt) = :year', { year })
+      .getCount();
 
     const sequence = String(count + 1).padStart(5, '0');
     return `BS-${year}-${sequence}`;

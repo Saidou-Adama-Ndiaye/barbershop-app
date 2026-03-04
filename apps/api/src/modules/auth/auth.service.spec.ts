@@ -218,6 +218,8 @@ describe('AuthService', () => {
         'uuid-001',
         'test@barbershop.sn',
         UserRole.CLIENT,
+        'Admin',
+        'Systeme'
       );
 
       expect(result).toHaveProperty('accessToken', 'mock_access_token');

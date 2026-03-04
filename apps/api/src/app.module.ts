@@ -6,7 +6,6 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 
-
 import { UsersModule }         from './modules/users/users.module';
 import { AuditModule }         from './modules/audit/audit.module';
 import { AuthModule }          from './modules/auth/auth.module';
@@ -18,8 +17,10 @@ import { PaymentsModule }      from './modules/payments/payments.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { StorageModule }       from './modules/storage/storage.module';
 import { FormationsModule }    from './modules/formations/formations.module';
-import { AdminModule } from './modules/admin/admin.module';
-
+import { AdminModule }         from './modules/admin/admin.module';
+import { CoiffeurModule }      from './modules/coiffeur/coiffeur.module';
+import { ReviewsModule }       from './modules/reviews/reviews.module';
+import { CouponsModule } from './modules/coupons/coupons.module';
 
 @Module({
   imports: [
@@ -61,6 +62,9 @@ import { AdminModule } from './modules/admin/admin.module';
     NotificationsModule,
     FormationsModule,
     AdminModule,
+    CoiffeurModule,
+    ReviewsModule,
+    CouponsModule,
   ],
 
   providers: [

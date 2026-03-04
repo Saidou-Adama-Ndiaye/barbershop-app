@@ -50,7 +50,21 @@ export class PacksService {
       qb.andWhere('category.slug = :slug', { slug: query.category });
     }
 
-    qb.orderBy('pack.createdAt', 'DESC').skip(skip).take(limit);
+    // ✅ Recherche textuelle
+    if (query.search?.trim()) {
+      qb.andWhere(
+        '(pack.name ILIKE :search OR pack.description ILIKE :search)',
+        { search: `%${query.search.trim()}%` },
+      );
+    }
+
+    // ✅ Tri dynamique
+    const sortField =
+      query.sortBy === 'price'   ? 'pack.basePrice'  :
+      query.sortBy === 'rating'  ? 'pack.avgRating'  :
+      'pack.createdAt';
+
+    qb.orderBy(sortField, query.order ?? 'DESC').skip(skip).take(limit);
 
     const [data, total] = await qb.getManyAndCount();
 

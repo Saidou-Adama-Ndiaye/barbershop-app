@@ -14,24 +14,23 @@ import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
+  PENDING    = 'pending',
+  CONFIRMED  = 'confirmed',
   PROCESSING = 'processing',
-  SHIPPED = 'shipped',
-  DELIVERED = 'delivered',
-  CANCELLED = 'cancelled',
-  REFUNDED = 'refunded',
+  SHIPPED    = 'shipped',
+  DELIVERED  = 'delivered',
+  CANCELLED  = 'cancelled',
+  REFUNDED   = 'refunded',
 }
 
-// Transitions autorisées par statut
 export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
-  [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+  [OrderStatus.PENDING]:    [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+  [OrderStatus.CONFIRMED]:  [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
   [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED],
-  [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
-  [OrderStatus.DELIVERED]: [OrderStatus.REFUNDED],
-  [OrderStatus.CANCELLED]: [],
-  [OrderStatus.REFUNDED]: [],
+  [OrderStatus.SHIPPED]:    [OrderStatus.DELIVERED],
+  [OrderStatus.DELIVERED]:  [OrderStatus.REFUNDED],
+  [OrderStatus.CANCELLED]:  [],
+  [OrderStatus.REFUNDED]:   [],
 };
 
 @Entity('orders')
@@ -62,14 +61,25 @@ export class Order {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
+  @Column({ name: 'coupon_code', type: 'varchar', length: 50, nullable: true, default: null })
+  couponCode: string | null;
+
+  @Column({
+    name: 'discount_amount',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  discountAmount: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 
-  // ─── Relations ────────────────────────────────────────────
-
+  // ─── Relations ──────────────────────────────────────
   @ManyToOne(() => User, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'user_id' })
   user: User;

@@ -4,12 +4,15 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
+import { useWishlistStore } from '@/lib/store/wishlist.store';
 import { setAccessToken } from '@/lib/api';
 import axios from 'axios';
+import ToastContainer from '@/components/ui/ToastContainer';
 
 // ─── Composant qui restaure la session au démarrage ──────
 function SessionRestorer() {
-  const { setAuth, clearAuth } = useAuthStore();
+  const { setAuth, clearAuth, isAuthenticated } = useAuthStore();
+  const { loadIds } = useWishlistStore();
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -38,6 +41,13 @@ function SessionRestorer() {
     restoreSession();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Charger les IDs wishlist dès que l'user est connecté
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadIds();
+    }
+  }, [isAuthenticated, loadIds]);
+
   return null;
 }
 
@@ -48,8 +58,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 60 * 1000,
-            retry: 1,
+            staleTime:            5 * 60 * 1000,
+            retry:                1,
             refetchOnWindowFocus: false,
           },
         },
@@ -60,6 +70,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <SessionRestorer />
       {children}
+      {/* ─── Toast notifications globales ── */}
+      <ToastContainer />
     </QueryClientProvider>
   );
 }

@@ -8,11 +8,12 @@ import { OrderItem } from './entities/order-item.entity';
 import { Pack } from '../packs/entities/pack.entity';
 import { Product } from '../packs/entities/product.entity';
 import { AuditModule } from '../audit/audit.module';
-
+import { CouponsModule } from '../coupons/coupons.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, Pack, Product]),
     AuditModule,
+    CouponsModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

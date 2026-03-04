@@ -193,4 +193,75 @@ export class NotificationsService {
 
     return qb.getMany();
   }
+
+  // ─── Notifications d'un utilisateur (client) ──────────
+  async findByUser(
+    userId: string,
+    limit:  number = 20,
+  ): Promise<NotificationLog[]> {
+    return this.logRepo
+      .createQueryBuilder('log')
+      .where('log.userId = :userId', { userId })
+      .orderBy('log.sentAt', 'DESC')
+      .take(Math.min(limit, 50)) // max 50 pour éviter les abus
+      .getMany();
+  }
+
+  // ─── Email nouveau RDV → coiffeur ─────────────────────
+  async sendNewBookingToStaff(
+    booking: Booking,
+    staffEmail: string,
+    staffFirstName: string,
+    clientName: string,
+    depositAmount: number,
+  ): Promise<void> {
+    const bookedDate = new Date(booking.bookedAt).toLocaleString('fr-SN', {
+      dateStyle: 'full', timeStyle: 'short',
+    });
+
+    await this.sendEmail({
+      to:       staffEmail,
+      subject:  `📅 Nouveau RDV — ${booking.bookingNumber}`,
+      template: 'nouveau-rdv',
+      userId:   booking.staffId,
+      data: {
+        staffFirstName,
+        bookingNumber: booking.bookingNumber,
+        clientName,
+        serviceName:   booking.service?.name ?? 'Service',
+        bookedAt:      bookedDate,
+        durationMin:   booking.service?.durationMin ?? 0,
+        depositAmount: new Intl.NumberFormat('fr-SN').format(depositAmount),
+        clientNotes:   booking.notes ?? '',
+      },
+    });
+  }
+
+  // ─── Email rappel 1h avant → coiffeur ─────────────────
+  async sendHourReminderToStaff(
+    booking: Booking,
+    staffEmail: string,
+    staffFirstName: string,
+    clientName: string,
+  ): Promise<void> {
+    const bookedDate = new Date(booking.bookedAt).toLocaleString('fr-SN', {
+      dateStyle: 'short', timeStyle: 'short',
+    });
+
+    await this.sendEmail({
+      to:       staffEmail,
+      subject:  `⏰ RDV dans 1h — ${booking.bookingNumber}`,
+      template: 'rappel-1h',
+      userId:   booking.staffId,
+      data: {
+        staffFirstName,
+        bookingNumber: booking.bookingNumber,
+        clientName,
+        serviceName:   booking.service?.name ?? 'Service',
+        bookedAt:      bookedDate,
+        durationMin:   booking.service?.durationMin ?? 0,
+        staffNotes:    booking.staffNotes ?? '',
+      },
+    });
+  }
 }

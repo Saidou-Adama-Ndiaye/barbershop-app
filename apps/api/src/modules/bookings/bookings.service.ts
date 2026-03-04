@@ -1,4 +1,4 @@
-// .\.\apps\api\src\modules\bookings\bookings.service.ts
+// apps\api\src\modules\bookings\bookings.service.ts
 import {
   Injectable,
   NotFoundException,
@@ -18,7 +18,7 @@ import { UserRole } from '../users/entities/user.entity';
 
 // ─── Types internes ───────────────────────────────────────
 export interface TimeSlot {
-  start: string; // ISO string
+  start: string;
   end: string;
   available: boolean;
 }
@@ -30,6 +30,20 @@ export interface AvailabilityResult {
   durationMin: number;
   slots: TimeSlot[];
 }
+
+// ─── Transitions autorisées par rôle ─────────────────────
+const COIFFEUR_STATUS_TRANSITIONS: Partial<Record<BookingStatus, BookingStatus[]>> = {
+  [BookingStatus.DEPOSIT_PAID]: [BookingStatus.CONFIRMED],
+  [BookingStatus.CONFIRMED]:    [BookingStatus.IN_PROGRESS, BookingStatus.NO_SHOW],
+  [BookingStatus.IN_PROGRESS]:  [BookingStatus.COMPLETED],
+};
+
+const ADMIN_STATUS_TRANSITIONS: Partial<Record<BookingStatus, BookingStatus[]>> = {
+  [BookingStatus.PENDING]:      [BookingStatus.CONFIRMED, BookingStatus.CANCELLED],
+  [BookingStatus.DEPOSIT_PAID]: [BookingStatus.CONFIRMED, BookingStatus.CANCELLED],
+  [BookingStatus.CONFIRMED]:    [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED, BookingStatus.NO_SHOW],
+  [BookingStatus.IN_PROGRESS]:  [BookingStatus.COMPLETED],
+};
 
 @Injectable()
 export class BookingsService {
@@ -49,61 +63,39 @@ export class BookingsService {
     date: string,
     serviceId: string,
   ): Promise<AvailabilityResult> {
-    // 1. Charger le service pour connaître la durée
     const service = await this.serviceRepository.findOne({
       where: { id: serviceId, isActive: true },
     });
     if (!service) throw new NotFoundException('Service introuvable');
 
-    // 2. Récupérer le jour de la semaine (0=Dim...6=Sam)
     const targetDate = new Date(date);
     const dayOfWeek  = targetDate.getDay();
 
-    // 3. Récupérer les plages horaires du coiffeur pour ce jour
     const availability = await this.availabilityRepository.findOne({
       where: { staffId, dayOfWeek, isActive: true },
     });
 
     if (!availability) {
-      return {
-        date,
-        staffId,
-        serviceId,
-        durationMin: service.durationMin,
-        slots: [],
-      };
+      return { date, staffId, serviceId, durationMin: service.durationMin, slots: [] };
     }
 
-    // 4. Récupérer les RDV existants ce jour-là
     const dayStart = new Date(`${date}T00:00:00.000Z`);
     const dayEnd   = new Date(`${date}T23:59:59.999Z`);
 
-    const existingBookings = await this.bookingRepository.find({
-      where: {
-        staffId,
-        bookedAt: Between(dayStart, dayEnd),
-        status: BookingStatus.PENDING,
-      },
+    const occupiedBookings = await this.bookingRepository.find({
+      where: [
+        { staffId, bookedAt: Between(dayStart, dayEnd), status: BookingStatus.PENDING },
+        { staffId, bookedAt: Between(dayStart, dayEnd), status: BookingStatus.DEPOSIT_PAID },
+        { staffId, bookedAt: Between(dayStart, dayEnd), status: BookingStatus.CONFIRMED },
+      ],
     });
 
-    // Ajouter aussi deposit_paid et confirmed comme occupés
-    const confirmedBookings = await this.bookingRepository.find({
-      where: {
-        staffId,
-        bookedAt: Between(dayStart, dayEnd),
-        status: BookingStatus.DEPOSIT_PAID,
-      },
-    });
-
-    const allBookings = [...existingBookings, ...confirmedBookings];
-
-    // 5. Générer les créneaux
     const slots = this.generateSlots(
       date,
       availability.startTime,
       availability.endTime,
       service.durationMin,
-      allBookings,
+      occupiedBookings,
     );
 
     return { date, staffId, serviceId, durationMin: service.durationMin, slots };
@@ -118,8 +110,6 @@ export class BookingsService {
     existingBookings: Booking[],
   ): TimeSlot[] {
     const slots: TimeSlot[] = [];
-
-    // Parser les heures (format HH:MM:SS depuis PostgreSQL)
     const [startH, startM] = startTime.split(':').map(Number);
     const [endH, endM]     = endTime.split(':').map(Number);
 
@@ -130,19 +120,17 @@ export class BookingsService {
       const slotStart = new Date(`${date}T${this.minutesToTime(current)}:00.000Z`);
       const slotEnd   = new Date(`${date}T${this.minutesToTime(current + durationMin)}:00.000Z`);
 
-      // Vérifier si le créneau est libre
       const isOccupied = existingBookings.some((booking) => {
         const bStart = new Date(booking.bookedAt).getTime();
         const bEnd   = new Date(booking.endAt).getTime();
         const sStart = slotStart.getTime();
         const sEnd   = slotEnd.getTime();
-        // Chevauchement
         return sStart < bEnd && sEnd > bStart;
       });
 
       slots.push({
-        start: slotStart.toISOString(),
-        end:   slotEnd.toISOString(),
+        start:     slotStart.toISOString(),
+        end:       slotEnd.toISOString(),
         available: !isOccupied,
       });
 
@@ -163,22 +151,14 @@ export class BookingsService {
     clientId: string,
     dto: CreateBookingDto,
   ): Promise<{ booking: Booking; depositAmount: number; payment: Record<string, unknown> }> {
-    // 1. Charger le service
     const service = await this.serviceRepository.findOne({
       where: { id: dto.serviceId, isActive: true },
     });
     if (!service) throw new NotFoundException('Service introuvable');
 
-    // 2. Calculer les dates
     const bookedAt = new Date(dto.bookedAt);
     const endAt    = new Date(bookedAt.getTime() + service.durationMin * 60 * 1000);
 
-    // 3. Vérifier disponibilité du créneau
-    const conflict = await this.bookingRepository.findOne({
-      where: { staffId: dto.staffId },
-    });
-
-    // Vérification de conflit précise via requête
     const conflictCheck = await this.bookingRepository
       .createQueryBuilder('booking')
       .where('booking.staff_id = :staffId', { staffId: dto.staffId })
@@ -192,36 +172,30 @@ export class BookingsService {
       .getOne();
 
     if (conflictCheck) {
-      throw new ConflictException(
-        'Ce créneau est déjà réservé. Veuillez choisir un autre horaire.',
-      );
+      throw new ConflictException('Ce créneau est déjà réservé. Veuillez choisir un autre horaire.');
     }
 
-    // 4. Calculer l'acompte
     const depositAmount = Math.round(
       (Number(service.price) * Number(service.depositPct)) / 100,
     );
 
-    // 5. Générer le numéro de réservation
     const bookingNumber = await this.generateBookingNumber();
 
-    // 6. Créer la réservation
     const booking = this.bookingRepository.create({
       bookingNumber,
       clientId,
-      staffId:    dto.staffId,
-      serviceId:  dto.serviceId,
+      staffId:     dto.staffId,
+      serviceId:   dto.serviceId,
       bookedAt,
       endAt,
-      totalPrice: Number(service.price),
+      totalPrice:  Number(service.price),
       depositPaid: 0,
-      notes:      dto.notes,
-      status:     BookingStatus.PENDING,
+      notes:       dto.notes,
+      status:      BookingStatus.PENDING,
     });
 
     const savedBooking = await this.bookingRepository.save(booking);
 
-    // 7. Audit log
     this.auditService.log({
       userId:     clientId,
       action:     'CREATE_BOOKING',
@@ -230,7 +204,6 @@ export class BookingsService {
       metadata:   { bookingNumber, serviceId: dto.serviceId, depositAmount },
     });
 
-    // 8. Retourner avec les infos de paiement (PaymentsService s'en chargera)
     return {
       booking: savedBooking,
       depositAmount,
@@ -256,7 +229,6 @@ export class BookingsService {
     } else if (userRole === UserRole.COIFFEUR) {
       qb.where('booking.staffId = :userId', { userId });
     }
-    // Admin/super_admin voient tout
 
     return qb.getMany();
   }
@@ -296,7 +268,6 @@ export class BookingsService {
       );
     }
 
-    // Politique remboursement : > 24h avant → remboursement
     const hoursUntilBooking =
       (new Date(booking.bookedAt).getTime() - Date.now()) / (1000 * 60 * 60);
 
@@ -315,6 +286,87 @@ export class BookingsService {
     });
 
     return { booking: saved, refundAmount, refundEligible };
+  }
+
+  // ─── PATCH /bookings/:id/status (coiffeur + admin) ───
+  async updateStatus(
+    id: string,
+    userId: string,
+    userRole: UserRole,
+    newStatus: BookingStatus,
+  ): Promise<Booking> {
+    const booking = await this.bookingRepository.findOne({
+      where: { id },
+      relations: ['service'],
+    });
+    if (!booking) throw new NotFoundException('Réservation introuvable');
+
+    // Vérifier que le coiffeur est bien assigné à ce RDV
+    const isAdmin    = userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN;
+    const isCoiffeur = userRole === UserRole.COIFFEUR;
+
+    if (isCoiffeur && booking.staffId !== userId) {
+      throw new ForbiddenException('Vous n\'êtes pas assigné à cette réservation');
+    }
+    if (!isAdmin && !isCoiffeur) {
+      throw new ForbiddenException('Accès refusé');
+    }
+
+    // Vérifier la transition
+    const transitions = isAdmin
+      ? ADMIN_STATUS_TRANSITIONS
+      : COIFFEUR_STATUS_TRANSITIONS;
+
+    const allowed = transitions[booking.status] ?? [];
+    if (!allowed.includes(newStatus)) {
+      throw new BadRequestException(
+        `Transition "${booking.status}" → "${newStatus}" non autorisée`,
+      );
+    }
+
+    booking.status = newStatus;
+    const saved = await this.bookingRepository.save(booking);
+
+    this.auditService.log({
+      userId,
+      action:     'UPDATE_BOOKING_STATUS',
+      entityType: 'Booking',
+      entityId:   id,
+      metadata:   { from: booking.status, to: newStatus },
+    });
+
+    return saved;
+  }
+
+  // ─── PATCH /bookings/:id/notes (coiffeur + admin) ────
+  async updateNotes(
+    id: string,
+    userId: string,
+    userRole: UserRole,
+    staffNotes: string,
+  ): Promise<Booking> {
+    const booking = await this.bookingRepository.findOne({
+      where: { id },
+      relations: ['service'],
+    });
+    if (!booking) throw new NotFoundException('Réservation introuvable');
+
+    const isAdmin    = userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN;
+    const isCoiffeur = userRole === UserRole.COIFFEUR;
+
+    if (isCoiffeur && booking.staffId !== userId) {
+      throw new ForbiddenException('Vous n\'êtes pas assigné à cette réservation');
+    }
+    if (!isAdmin && !isCoiffeur) {
+      throw new ForbiddenException('Accès refusé — réservé au coiffeur et à l\'admin');
+    }
+
+    await this.bookingRepository.update(id, { staffNotes });
+
+    return this.bookingRepository.findOneOrFail({
+      where: { id },
+      relations: ['service'],
+    });
   }
 
   // ─── Helper : numéro de réservation ──────────────────

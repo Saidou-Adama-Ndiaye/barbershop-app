@@ -6,6 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import api from '@/lib/api';
 import PackCustomizer from '@/components/shop/PackCustomizer';
+import ReviewsSection from '@/components/shop/ReviewsSection';
+import WishlistButton from '@/components/shop/WishlistButton';
+import StarRating from '@/components/shop/StarRating';
 import Badge from '@/components/ui/Badge';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 
@@ -20,11 +23,18 @@ interface PackDetail {
   finalPrice: number;
   imageUrls: string[];
   isCustomizable: boolean;
+  avgRating: number;
+  reviewCount: number;
   category?: { name: string; slug: string };
   packProducts: {
     id: string;
     productId: string;
-    product: { id: string; name: string; unitPrice: number };
+    product: {
+      id: string;
+      name: string;
+      unitPrice: number;
+      imageUrls?: string[];
+    };
     quantity: number;
     isOptional: boolean;
   }[];
@@ -40,7 +50,7 @@ const formatPrice = (amount: number): string =>
 // ─── Composant ────────────────────────────────────────────
 export default function PackDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const router = useRouter();
+  const router   = useRouter();
 
   const { data: pack, isLoading, isError } = useQuery({
     queryKey: ['pack', slug],
@@ -80,11 +90,14 @@ export default function PackDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-12">
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500">
-        <button onClick={() => router.push('/packs')} className="hover:text-gray-900 transition-colors">
+        <button
+          onClick={() => router.push('/packs')}
+          className="hover:text-gray-900 transition-colors"
+        >
           Catalogue
         </button>
         <span>›</span>
@@ -127,14 +140,27 @@ export default function PackDetailPage() {
                 <Badge variant="blue">Personnalisable</Badge>
               )}
             </div>
+
+            {/* Bouton wishlist */}
+            <div className="absolute top-4 right-4">
+              <WishlistButton packId={pack.id} size="md" />
+            </div>
           </div>
 
           {/* Galerie miniatures */}
           {pack.imageUrls?.length > 1 && (
             <div className="flex gap-2">
               {pack.imageUrls.slice(1, 4).map((url, i) => (
-                <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
-                  <Image src={url} alt={`${pack.name} ${i + 2}`} fill className="object-cover" />
+                <div
+                  key={i}
+                  className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100"
+                >
+                  <Image
+                    src={url}
+                    alt={`${pack.name} ${i + 2}`}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -145,8 +171,24 @@ export default function PackDetailPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{pack.name}</h1>
+
+            {/* Note globale */}
+            {pack.reviewCount > 0 && (
+              <div className="flex items-center gap-2 mt-2">
+                <StarRating value={pack.avgRating} readonly size="md" />
+                <span className="font-semibold text-gray-900">
+                  {Number(pack.avgRating).toFixed(1)}
+                </span>
+                <span className="text-gray-400 text-sm">
+                  · {pack.reviewCount} avis
+                </span>
+              </div>
+            )}
+
             {pack.description && (
-              <p className="text-gray-600 mt-3 leading-relaxed">{pack.description}</p>
+              <p className="text-gray-600 mt-3 leading-relaxed">
+                {pack.description}
+              </p>
             )}
           </div>
 
@@ -175,6 +217,16 @@ export default function PackDetailPage() {
           />
         </div>
       </div>
+
+      {/* ─── Section Avis ──────────────────────────────────── */}
+      <div className="border-t border-gray-100 pt-10">
+        <ReviewsSection
+          slug={slug}
+          avgRating={pack.avgRating}
+          reviewCount={pack.reviewCount}
+        />
+      </div>
+
     </div>
   );
 }

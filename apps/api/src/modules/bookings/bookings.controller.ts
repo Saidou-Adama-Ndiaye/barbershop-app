@@ -1,4 +1,4 @@
-// .\.\apps\api\src\modules\bookings\bookings.controller.ts
+// apps\api\src\modules\bookings\bookings.controller.ts
 import {
   Controller,
   Get,
@@ -17,16 +17,41 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
+import { IsEnum, IsString, IsOptional, MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BookingsService } from './bookings.service';
 import { PaymentsService } from '../payments/payments.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { CancelBookingDto } from './dto/cancel-booking.dto';
 import { QueryAvailabilityDto } from './dto/query-availability.dto';
+import { BookingStatus } from './entities/booking.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserRole } from '../users/entities/user.entity';
 
+// ─── DTOs ─────────────────────────────────────────────────
+export class UpdateBookingStatusDto {
+  @ApiProperty({
+    enum: BookingStatus,
+    example: BookingStatus.CONFIRMED,
+    description: 'Nouveau statut de la réservation',
+  })
+  @IsEnum(BookingStatus, { message: 'Statut invalide' })
+  status: BookingStatus;
+}
+
+export class UpdateBookingNotesDto {
+  @ApiPropertyOptional({ example: 'Client préfère la tondeuse n°3, allergie au gel.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000, { message: 'Notes trop longues (max 2000 caractères)' })
+  staffNotes: string;
+}
+
+// ─── Interface AuthUser ───────────────────────────────────
 interface AuthUser {
   id: string;
   email: string;
@@ -72,7 +97,6 @@ export class BookingsController {
   ) {
     const result = await this.bookingsService.createBooking(user.id, dto);
 
-    // Initier le paiement de l'acompte
     const payment = await this.paymentsService.initiatePayment({
       amount:     result.depositAmount,
       currency:   'XOF',
@@ -115,5 +139,36 @@ export class BookingsController {
     @CurrentUser() user: AuthUser,
   ) {
     return this.bookingsService.cancelBooking(id, user.id, user.role, dto);
+  }
+
+  // ─── PATCH /bookings/:id/status ───────────────────────
+  @Patch(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.COIFFEUR, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Mettre à jour le statut d\'un RDV (coiffeur + admin)' })
+  @ApiResponse({ status: 200, description: 'Statut mis à jour' })
+  @ApiResponse({ status: 400, description: 'Transition non autorisée' })
+  @ApiResponse({ status: 403, description: 'RDV non assigné à ce coiffeur' })
+  updateStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateBookingStatusDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.bookingsService.updateStatus(id, user.id, user.role, dto.status);
+  }
+
+  // ─── PATCH /bookings/:id/notes ────────────────────────
+  @Patch(':id/notes')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.COIFFEUR, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Notes privées du coiffeur sur un RDV' })
+  @ApiResponse({ status: 200, description: 'Notes mises à jour' })
+  @ApiResponse({ status: 403, description: 'RDV non assigné à ce coiffeur' })
+  updateNotes(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateBookingNotesDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.bookingsService.updateNotes(id, user.id, user.role, dto.staffNotes);
   }
 }

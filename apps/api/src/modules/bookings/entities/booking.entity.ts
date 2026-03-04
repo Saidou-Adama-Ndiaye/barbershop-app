@@ -1,4 +1,4 @@
-// .\.\apps\api\src\modules\bookings\entities\booking.entity.ts
+// apps\api\src\modules\bookings\entities\booking.entity.ts
 import {
   Entity,
   Column,
@@ -71,6 +71,10 @@ export class Booking {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  // ─── Notes privées du coiffeur (invisibles au client) ─
+  @Column({ name: 'staff_notes', type: 'text', nullable: true })
+  staffNotes: string | null;
 
   @Column({ name: 'reminder_sent', default: false })
   reminderSent: boolean;

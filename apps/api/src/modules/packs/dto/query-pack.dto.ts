@@ -1,6 +1,6 @@
 // .\.\apps\api\src\modules\packs\dto\query-pack.dto.ts
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
+import { IsOptional, IsString, IsInt, IsIn, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class QueryPackDto {
@@ -8,6 +8,23 @@ export class QueryPackDto {
   @IsOptional()
   @IsString()
   category?: string;
+
+  @ApiPropertyOptional({ example: 'coupe' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({ example: 'price', enum: ['price', 'rating', 'createdAt'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['price', 'rating', 'createdAt'])
+  sortBy?: 'price' | 'rating' | 'createdAt';
+
+  @ApiPropertyOptional({ example: 'DESC', enum: ['ASC', 'DESC'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['ASC', 'DESC'])
+  order?: 'ASC' | 'DESC';
 
   @ApiPropertyOptional({ example: 1, default: 1 })
   @IsOptional()

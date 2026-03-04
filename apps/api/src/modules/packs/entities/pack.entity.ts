@@ -53,14 +53,26 @@ export class Pack {
   @Column({ name: 'category_id', nullable: true })
   categoryId: string;
 
+  // ─── Nouveaux champs Sprint 7 ─────────────────────────
+  @Column({
+    name: 'avg_rating',
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    default: 0,
+  })
+  avgRating: number;
+
+  @Column({ name: 'review_count', type: 'int', default: 0 })
+  reviewCount: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 
-  // ─── Relations ────────────────────────────────────────────
-
+  // ─── Relations ────────────────────────────────────────
   @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'category_id' })
   category: Category;

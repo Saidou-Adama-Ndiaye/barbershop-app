@@ -1,4 +1,4 @@
-// .\.\apps\api\src\modules\auth\auth.module.ts
+// apps\api\src\modules\auth\auth.module.ts
 import { Module } from '@nestjs/common';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -14,6 +14,7 @@ import { RolesGuard } from './guards/roles.guard';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { UsersModule } from '../users/users.module';
 import { AuditModule } from '../audit/audit.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -26,9 +27,6 @@ import { AuditModule } from '../audit/audit.module';
         const secret = config.get<string>('JWT_SECRET');
         if (!secret) throw new Error('JWT_SECRET manquant dans .env.local');
 
-        // StringValue est un type branded de la lib "ms" utilisée par jsonwebtoken
-        // Le cast via unknown est nécessaire car ConfigService retourne string
-        // mais JwtModuleOptions attend StringValue — en runtime c'est identique
         const expiresIn = config.get<string>(
           'JWT_EXPIRES_IN',
           '15m',
@@ -48,6 +46,7 @@ import { AuditModule } from '../audit/audit.module';
     TypeOrmModule.forFeature([RefreshToken]),
     UsersModule,
     AuditModule,
+    NotificationsModule,
   ],
   controllers: [AuthController],
   providers: [

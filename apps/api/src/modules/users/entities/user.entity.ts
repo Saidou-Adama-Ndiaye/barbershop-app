@@ -1,4 +1,4 @@
-// .\.\apps\api\src\modules\users\entities\user.entity.ts
+// apps\api\src\modules\users\entities\user.entity.ts
 import {
   Entity,
   Column,
@@ -51,6 +51,21 @@ export class User {
   @Column({ name: 'is_verified', default: false })
   isVerified: boolean;
 
+  // ─── Vérification email ───────────────────────────────
+  @Column({ name: 'verification_token', type: 'text', nullable: true, select: false })
+  verificationToken: string | null;
+
+  @Column({ name: 'verified_at', type: 'timestamptz', nullable: true })
+  verifiedAt: Date | null;
+
+  // ─── Réinitialisation mot de passe ────────────────────
+  @Column({ name: 'reset_password_token', type: 'text', nullable: true, select: false })
+  resetPasswordToken: string | null;
+
+  @Column({ name: 'reset_password_expires_at', type: 'timestamptz', nullable: true })
+  resetPasswordExpiresAt: Date | null;
+
+  // ─── OAuth ────────────────────────────────────────────
   @Column({ name: 'oauth_provider', length: 50, nullable: true })
   oauthProvider: string;
 
@@ -77,15 +92,9 @@ export class User {
     return bcrypt.compare(plainPassword, this.passwordHash);
   }
 
-  toSafeObject(): Omit<
-    User,
-    | 'passwordHash'
-    | 'comparePassword'
-    | 'toSafeObject'
-    | 'hashPasswordBeforeInsert'
-  > {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...safe } = this;
-    return safe;
+  toSafeObject(): Omit<User, 'passwordHash' | 'comparePassword' | 'toSafeObject' | 'hashPasswordBeforeInsert'> {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordHash, ...safe } = this;
+      return safe as Omit<User, 'passwordHash' | 'comparePassword' | 'toSafeObject' | 'hashPasswordBeforeInsert'>;
   }
 }

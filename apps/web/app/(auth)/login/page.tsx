@@ -92,9 +92,19 @@ export default function LoginPage() {
               focus:ring-2 focus:ring-gray-900 focus:border-transparent
               ${errors.password ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-white'}`}
           />
-          {errors.password && (
+        {errors.password && (
             <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
           )}
+        </div>
+
+        {/* Mot de passe oublié */}
+        <div className="text-right">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            Mot de passe oublié ?
+          </Link>
         </div>
 
         {/* Erreur API */}
